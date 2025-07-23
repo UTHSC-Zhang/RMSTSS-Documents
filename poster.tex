@@ -1,5 +1,6 @@
 \documentclass[a0,landscape]{a0poster}
 \usepackage{helvet} % Use Helvetica as the sans-serif font
+\usepackage[dvipsnames]{xcolor} % For advanced color options
 \usepackage{graphicx}
 \usepackage{geometry}
 \usepackage{qrcode}
@@ -7,110 +8,119 @@
 \usepackage{alltt}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta}
+\usepackage{setspace} % For line spacing control
+\usepackage[compact]{titlesec} % To control heading space
+\usepackage{enumitem} % To control list spacing
+\usepackage{pifont}       % for \ding{55}
+\usepackage{xcolor}       % for \color
+\usepackage{enumitem}     % for itemize customization
+
+% --- Custom Colors for the New Theme ---
+\definecolor{HeadingColor}{RGB}{0, 90, 110}   % A deep teal for headings
+\definecolor{BulletColor}{RGB}{0, 130, 150}   % A brighter teal for accents
+\definecolor{BulletColor}{RGB}{220,50,47}  % example red color
+\newcommand{\xmark}{\ding{55}}            % cross mark symbol
 
 % --- Set sans-serif as the default font family ---
 \renewcommand{\familydefault}{\sfdefault}
 
 % --- Page Geometry (48x36 inches with a 1-inch margin) ---
-\geometry{papersize={48in,36in}, margin=1in, top=1.5in}
+\geometry{papersize={48in,36in}, margin=1in, top=1in, bottom=1in}
+
+% --- Global Spacing Adjustments ---
+\setstretch{0.95} % Reduce space between lines in a paragraph
+\setlist{nosep}  % Remove all vertical space in lists
+\titlespacing*{\subsection}{0pt}{1ex}{0.5ex} % Reduce space around subsection headings
 
 \begin{document}
 
 % === GRADIENT BACKGROUND ===
 \begin{tikzpicture}[remember picture, overlay]
-    \shade[top color=blue!10, bottom color=blue!25, middle color=blue!15]
+    \shade[left color=cyan!10, right color=teal!25]
     (current page.south west) rectangle (current page.north east);
 \end{tikzpicture}
 
-% === NEW HEADER BLOCK (Title on left, QR code on right) ===
+% === HEADER BLOCK ===
 \begin{minipage}[c]{0.78\linewidth}
-    \Huge \textbf{A Software Tool for Planning Better Clinical Trials} \\ %\vspace{3cm}
-    \huge \textbf{Arnab Aich, Yuan Zhang} \\
-    \Large \textit{Department of Preventive Medicine, University of Tennessee Health Science Center}
+    \fontsize{60}{66}\selectfont \textbf{\color{HeadingColor}A Software Tool for Planning Better Clinical Trials} \\
+    \Large \textbf{Arnab Aich, Yuan Zhang} \\
+    \large \textit{Department of Preventive Medicine, University of Tennessee Health Science Center}
 \end{minipage}
 \hfill
 \begin{minipage}[c]{0.2\linewidth}
-    \begin{center}
-        \qrcode[height=4.5cm]{https://github.com/UTHSC-Zhang/RMSTSS-Package}
-    \end{center}
+    \centering
+    \qrcode[height=4.5cm]{https://github.com/UTHSC-Zhang/RMSTSS-Package}
 \end{minipage}
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \rule{\linewidth}{1.5pt}
-\vspace{1cm}
+
 
 
 % === TWO-COLUMN LAYOUT START ===
-
 \begin{minipage}[t]{0.44\linewidth}
 
-    \subsection*{\huge Key Questions in Clinical Trials}
-    \begin{center}
-        \includegraphics[width=\linewidth]{images/diag-CT.png}
-    \end{center}
+    \subsection*{\color{HeadingColor}\Large Key Questions in Clinical Trials}
+    {\centering \includegraphics[width=\linewidth,height = 0.4\linewidth]{images/diag-CT.png}\par}
 
-    \subsection*{\Large Problems in Traditional Methods}
-    \large For decades, Survival trials (\textit{Time to event}) have relied on the \textbf{HR} (Hazard Ratio).
+    \subsection*{\color{HeadingColor}\Large Problems in Traditional Methods}
+    \Large Survival trials (\textit{Time to event}) relies on the \textbf{HR} (Hazard Ratio).
+   \begin{itemize}[label={\color{BulletColor}\Large \xmark}]
+    \item \Large Depends on strong assumptions, violated in the real world.
+    \item \Large Can't identify treatment benefits.
+\end{itemize}
+    
+    \subsection*{\color{HeadingColor}\Large Our Solution: Restricted Mean Survival Time}
     \begin{itemize}
-        \item[\large\checkmark] This metric depends on strong assumptions that are often violated in the real world.
-        \item[\large\checkmark] Can't identify treatment benefits.
+        \item[{\color{BulletColor}\Large\checkmark}] \Large Directly measures the average \textbf{event-free} time of patients.
+        \item[{\color{BulletColor}\Large\checkmark}] \Large It is easy for everyone to understand.
+        \item[{\color{BulletColor}\Large\checkmark}] \Large It provides a clear measure of treatment benefit.
     \end{itemize}
-    \subsection*{\Large Our Solution: RMST}
-    \large We use \textbf{RMST} (Restricted Mean Survival Time), which directly measures the average \textbf{event-free} time patients experience.
-    \begin{itemize}
-        \item[\large\checkmark] It is easy for everyone to understand.
-        \item[\large\checkmark] It provides a clear measure of treatment benefit.
-    \end{itemize}
-    \begin{center}
-        \includegraphics[width=\linewidth,height = 0.5\linewidth]{images/rmst_causal_plot.png}
-    \end{center}
+  \vspace{0.2cm}    
+    {\centering \includegraphics[width=\linewidth]{images/rmst_causal_plot.png}\par}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.54\linewidth}
     % --- COLUMN 2: THE RMSTSS TOOL ---
-    \subsection*{\huge What We Are Offering}
-%    \Large ‘RMSTSS‘ is a free tool that helps researchers properly plan modern medical studies.
-    \begin{center}
-        \includegraphics[width=\linewidth]{images/app-ss.png}
-    \end{center}
-    \subsection*{\Large App Features}
-    \begin{itemize}
-        \item \large \textbf{Variable Selection:} Choose variables to add in model.
-        \item \large \textbf{Flexible Methods:} Use a \textbf{Quick Check} (Analytical) or a \textbf{Deep Dive}(Bootstrap).
-        \item \large \textbf{Downloadable Reports:} Generate an HTML report for documenting purposes.
-        \item \large \textbf{Customization:} Change themes, fonts, size, and many more on the go.
-    \end{itemize}
+    \subsection*{\color{HeadingColor}\Large What We Are Offering}
+    {\centering \includegraphics[width=\linewidth,height = 0.58\linewidth]{images/app-ss.png}\par}
     
-    \begin{center}
-        \includegraphics[width=\linewidth,height = 0.4\linewidth]{images/app-models.png}
-    \end{center}
+\vspace{0.2cm}    
+
+    \subsection*{\color{HeadingColor}\Large App Features}
+    \begin{itemize}
+        \item[{\color{BulletColor}\Large\checkmark}] \Large \textbf{Variable Selection:} Choose variables to add in model.
+        \item[{\color{BulletColor}\Large\checkmark}] \Large \textbf{Flexible Methods:} Use a \textbf{Quick Check} (Analytical) or a \textbf{Deep Dive}(Bootstrap).
+        \item[{\color{BulletColor}\Large\checkmark}] \Large \textbf{Downloadable Reports:} Generate an HTML report.
+        \item[{\color{BulletColor}\Large\checkmark}] \Large \textbf{Customization:} Change themes, fonts, size, and many more on the go.
+    \end{itemize}
+\vspace{0.2cm}    
+    {\centering \includegraphics[width=\linewidth]{images/app-models.png}\par}
     
 \end{minipage}
 
-\hfill
-
+% === FOOTER AREA ===
+\vspace{0.2cm}
 \rule{\linewidth}{1pt} % Horizontal line to separate footer
+
 
 \begin{minipage}[t]{0.5\linewidth}
     \subsection*{\Large For Statisticians and Programmers}
     \large We also developed an \textbf{R-Package} for function-level interaction. After installing the package from GitHub, the app can be run locally using the \verb|RMSTSS::run_app()| function call. For package website scan the QR code.
 \end{minipage}
 \hfill
-\begin{minipage} {0.2\linewidth}
-\vspace{0.5cm}
+\begin{minipage} {0.1\linewidth}
     \begin{center}
         \qrcode[height=4.5cm]{https://github.com/UTHSC-Zhang/RMSTSS-Package}
     \end{center}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.25\linewidth}
+\begin{minipage}[t]{0.3\linewidth}
     \subsection*{\Large Acknowledgments}
     \begin{enumerate}
-        \item NSF grant no. 2220726.
-        \item UTHSC BERD (Biostatistics, Epidemiology and Research Design).
+        \item \large NSF grant no. 2220726.
+        \item \large UTHSC BERD (Biostatistics, Epidemiology and Research Design).
     \end{enumerate}
 \end{minipage}
-
 % === LAYOUT END ===
-
 \end{document}
