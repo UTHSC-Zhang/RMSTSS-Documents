@@ -1,46 +1,52 @@
+% =====================================================================
+% RMSTSS A0 Landscape Poster (Improved Layout & Color Sections)
+% =====================================================================
 \documentclass[a0,landscape]{a0poster}
-\usepackage{helvet} % Use Helvetica as the sans-serif font
-\usepackage[dvipsnames]{xcolor} % For advanced color options
-\usepackage{graphicx}
-\usepackage{geometry}
-\usepackage{qrcode}
-\usepackage{amssymb}
-\usepackage{alltt}
-\usepackage{tikz}
+
+% ---------------------------------------------------------------------
+% PACKAGES
+% ---------------------------------------------------------------------
+\usepackage{helvet}                % Helvetica (sans-serif)
+\usepackage[dvipsnames]{xcolor}    % Extended colors
+\usepackage{graphicx}              % Include graphics
+\usepackage{geometry}              % Page geometry
+\usepackage{qrcode}                % QR codes
+\usepackage{amssymb}               % Math symbols
+\usepackage{alltt}                 % Verbatim-ish environment
+\usepackage{tikz}                  % TikZ for backgrounds
 \usetikzlibrary{shapes.geometric, arrows.meta}
-\usepackage{setspace} % For line spacing control
-\usepackage[compact]{titlesec} % To control heading space
-\usepackage{enumitem} % To control list spacing
-\usepackage{pifont}       % for \ding{55}
-\usepackage{xcolor}       % for \color
-\usepackage{enumitem}     % for itemize customization
+\usepackage{setspace}              % Line spacing
+\usepackage[compact]{titlesec}     % Heading spacing
+\usepackage{enumitem}              % List control
+\usepackage{pifont}                % \\ding symbols
 
-% --- Custom Colors for the New Theme ---
-\definecolor{HeadingColor}{RGB}{0, 90, 110}   % A deep teal for headings
-\definecolor{BulletColor}{RGB}{0, 130, 150}   % A brighter teal for accents
-\definecolor{BulletColor}{RGB}{220,50,47}  % example red color
-\newcommand{\xmark}{\ding{55}}            % cross mark symbol
+% --- Custom Colors ---
+\definecolor{HeadingColor}{RGB}{0, 90, 110}   % Teal for headings
+\definecolor{BulletColor}{RGB}{220,50,47}     % Red for cross marks
 
-% --- Set sans-serif as the default font family ---
+\newcommand{\xmark}{\ding{55}}              % Cross symbol
+
 \renewcommand{\familydefault}{\sfdefault}
 
-% --- Page Geometry (48x36 inches with a 1-inch margin) ---
 \geometry{papersize={48in,36in}, margin=1in, top=1in, bottom=1in}
 
-% --- Global Spacing Adjustments ---
-\setstretch{0.95} % Reduce space between lines in a paragraph
-\setlist{nosep}  % Remove all vertical space in lists
-\titlespacing*{\subsection}{0pt}{1ex}{0.5ex} % Reduce space around subsection headings
+\setstretch{0.95}
+\setlist{nosep}
+\titlespacing*{\subsection}{0pt}{1ex}{0.5ex}
 
 \begin{document}
 
-% === GRADIENT BACKGROUND ===
 \begin{tikzpicture}[remember picture, overlay]
-    \shade[left color=cyan!10, right color=teal!25]
-    (current page.south west) rectangle (current page.north east);
+    % Header background changed to an orange gradient
+    \shade[top color=Orange!0, bottom color=Orange] 
+        (current page.north west) rectangle ([yshift=-6in]current page.north east);
+    
+    % Other background sections remain unchanged
+    \fill[gray!20] (current page.south west) rectangle ([yshift=4in]current page.south west |- current page.south east);
+    \shade[top color=cyan!5, bottom color=teal!50]
+        ([yshift=-6in]current page.north west) rectangle ([yshift=4in]current page.south east);
 \end{tikzpicture}
 
-% === HEADER BLOCK ===
 \begin{minipage}[c]{0.78\linewidth}
     \fontsize{60}{66}\selectfont \textbf{\color{HeadingColor}A Software Tool for Planning Better Clinical Trials} \\
     \Large \textbf{Arnab Aich, Yuan Zhang} \\
@@ -55,13 +61,10 @@
 \vspace{0.2cm}
 \rule{\linewidth}{1.5pt}
 
-
-
-% === TWO-COLUMN LAYOUT START ===
 \begin{minipage}[t]{0.44\linewidth}
 
     \subsection*{\color{HeadingColor}\Large Key Questions in Clinical Trials}
-    {\centering \includegraphics[width=\linewidth,height = 0.4\linewidth]{images/diag-CT.png}\par}
+    {\centering \includegraphics[width=\linewidth,height = 0.45\linewidth]{images/diag-CT.png}\par}
 
     \subsection*{\color{HeadingColor}\Large Problems in Traditional Methods}
     \Large Survival trials (\textit{Time to event}) relies on the \textbf{HR} (Hazard Ratio).
@@ -69,7 +72,7 @@
     \item \Large Depends on strong assumptions, violated in the real world.
     \item \Large Can't identify treatment benefits.
 \end{itemize}
-    
+
     \subsection*{\color{HeadingColor}\Large Our Solution: Restricted Mean Survival Time}
     \begin{itemize}
         \item[{\color{BulletColor}\Large\checkmark}] \Large Directly measures the average \textbf{event-free} time of patients.
@@ -81,12 +84,10 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.54\linewidth}
-    % --- COLUMN 2: THE RMSTSS TOOL ---
     \subsection*{\color{HeadingColor}\Large What We Are Offering}
     {\centering \includegraphics[width=\linewidth,height = 0.58\linewidth]{images/app-ss.png}\par}
-    
-\vspace{0.2cm}    
 
+\vspace{0.2cm}    
     \subsection*{\color{HeadingColor}\Large App Features}
     \begin{itemize}
         \item[{\color{BulletColor}\Large\checkmark}] \Large \textbf{Variable Selection:} Choose variables to add in model.
@@ -96,13 +97,10 @@
     \end{itemize}
 \vspace{0.2cm}    
     {\centering \includegraphics[width=\linewidth]{images/app-models.png}\par}
-    
 \end{minipage}
 
-% === FOOTER AREA ===
 \vspace{0.2cm}
-\rule{\linewidth}{1pt} % Horizontal line to separate footer
-
+\rule{\linewidth}{1.5pt} % Horizontal line to separate footer
 
 \begin{minipage}[t]{0.5\linewidth}
     \subsection*{\Large For Statisticians and Programmers}
@@ -122,5 +120,5 @@
         \item \large UTHSC BERD (Biostatistics, Epidemiology and Research Design).
     \end{enumerate}
 \end{minipage}
-% === LAYOUT END ===
+
 \end{document}
