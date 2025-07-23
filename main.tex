@@ -1,0 +1,115 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\title{RMST-Based Sample Size Estimation}
+\subtitle{Methods in survRM2, nphRCT, and gsDesign2}
+\author{Arnab Aich}
+\institute{UTHSC-PM}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Overview}
+\begin{itemize}
+    \item Restricted Mean Survival Time (RMST) is a robust, model-free summary measure for time-to-event data:
+    \[
+    \mu(\tau) = \mathbb{E}[\min(T, \tau)] = \int_0^\tau S(t) \, dt
+    \]
+    \item Unlike the hazard ratio, RMST does not assume proportional hazards.
+    \item Used increasingly for both inference and design in clinical trials.
+    \item This talk focuses on three R packages that support RMST-based estimation or sample size:
+    \begin{itemize}
+        \item \texttt{survRM2}
+        \item \texttt{nphRCT}
+        \item \texttt{gsDesign2}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+% Slide 2 - survRM2
+\begin{frame}{survRM2::rmst2 - Estimation}
+\begin{itemize}
+    \item \texttt{rmst2} estimates RMST under a treatment-control setting:
+    \[
+    \hat{\mu}_g(\tau) = \int_0^\tau \hat{S}_g(t) \, dt
+    \]
+    where $\hat{S}_g(t)$ is the Kaplan-Meier estimator in group $g$.
+    
+    \item RMST difference: 
+    \[
+    \hat{\Delta}_{\text{RMST}} = \hat{\mu}_1(\tau) - \hat{\mu}_0(\tau)
+    \]
+    
+    \item Standard error is computed via Greenwood's formula and delta method.
+    
+    \item Wald-type test:
+    \[
+    T = \frac{\hat{\Delta}_{\text{RMST}}}{\text{SE}(\hat{\Delta})}
+    \]
+    
+    \item Though no built-in sample size calculator, RMST difference and SE from \texttt{survRM2} can be used as inputs for power/sample size calculations.
+\end{itemize}
+\end{frame}
+
+% Slide 4 - nphRCT
+\begin{frame}{nphRCT - Simulation-Based Estimation}
+\begin{itemize}
+    \item \texttt{nphRCT} supports flexible trial designs including non-proportional hazards and delayed treatment effects.
+
+    \item RMST-based power is computed using Monte Carlo simulation:
+    \begin{enumerate}
+        \item Simulate survival data under control and treatment groups.
+        \item Estimate $\hat{\mu}_1(\tau)$ and $\hat{\mu}_0(\tau)$ using the Kaplan-Meier method.
+        \item Compute RMST difference $\hat{\Delta}_{\text{RMST}}$.
+        \item Evaluate proportion of simulations where:
+        \[
+        \hat{\Delta}_{\text{RMST}} > z_{1-\alpha} \cdot \text{SE}
+        \]
+        to estimate power.
+    \end{enumerate}
+
+    \item Sample size is adjusted iteratively to achieve desired power.
+    \item Allows incorporating cure models, lagged effects, and complex hazard structures.
+\end{itemize}
+\end{frame}
+
+% Slide 7 - gsDesign2
+\begin{frame}{gsDesign2 - RMST-Based Design}
+\begin{itemize}
+    \item \texttt{gsDesign2} extends group sequential methods to nonparametric endpoints like RMST.
+
+    \item Test statistic:
+    \[
+    T = \frac{\hat{\mu}_1(\tau) - \hat{\mu}_0(\tau)}{\sqrt{\hat{\sigma}^2 / n}}
+    \]
+    where $\hat{\sigma}^2$ is the estimated variance of the RMST difference.
+
+    \item Procedure:
+    \begin{enumerate}
+        \item Specify $\tau$, effect size ($\Delta$), and desired power.
+        \item Estimate variance $\hat{\sigma}^2$ from historical data or \texttt{survRM2}.
+        \item Solve for sample size using:
+        \[
+        n = \left( \frac{Z_{1-\alpha/2} + Z_{1-\beta}}{\Delta / \sigma} \right)^2
+        \]
+    \end{enumerate}
+
+    \item Allows interim analysis, adaptive design, and stopping rules under RMST framework.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+\begin{itemize}
+    \item RMST is a powerful alternative to hazard ratios, especially under non-proportional hazards.
+    \item \texttt{survRM2} provides robust estimation and hypothesis testing.
+    \item \texttt{nphRCT} and \texttt{gsDesign2} extend this to simulation and adaptive design for planning.
+\end{itemize}
+\end{frame}
+
+\end{document}
+
+

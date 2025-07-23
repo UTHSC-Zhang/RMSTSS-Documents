@@ -1,0 +1,100 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\title{RMST-Based Estimation and Dynamic Prediction}
+\author{Arnab Aich}
+\institute{UTHSC}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Model Setup and IPCW}
+\begin{itemize}
+  \item Observed: \( T, C, X = \min(T, C), \delta = \mathbf{1}\{T \leq C\} \)
+  \item Truncated at \( L \): \( Y = \min(X, L), \delta_Y = \mathbf{1}\{T \leq \min(C, L)\} \)
+  \item Covariates: \( Z \in \mathbb{R}^p \), censoring covariates \( Z_C \), stratum \( S \in \{1, \dots, J\} \)
+  \item RMST model: \( \mathbb{E}[Y \mid Z, S] = \mu_0(S) + Z^\top \beta \)
+  \item IPCW weights: \( W_i = \delta_{Y,i} / \hat{G}(Y_i \mid Z_{C,i}, S_i) \)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation of Parameters}
+\textbf{Centering:}
+\[
+Z_i^c = Z_i - \bar{Z}_{S_i}, \quad \bar{Z}_j = \frac{\sum_{i \in S_j} W_i Z_i}{\sum_{i \in S_j} W_i}
+\]
+
+\textbf{Estimates:}
+\[
+\hat{\beta} = \left( \sum W_i Z_i^c Z_i^{c\top} \right)^{-1} \left( \sum W_i Z_i^c Y_i \right)
+\]
+\[
+\hat{\mu}_0(j) = \frac{ \sum_{i \in S_j} W_i (Y_i - Z_i^\top \hat{\beta}) }{ \sum_{i \in S_j} W_i }
+\]
+
+\textbf{Variance:}
+\[
+\hat{V}(\hat{\beta}) = \frac{1}{n} A^{-1} B A^{-\top}
+\]
+where \( A = \frac{1}{n} \sum W_i Z_i^c Z_i^{c\top} \), 
+\( B = \frac{1}{n} \sum W_i^2 Z_i^c Z_i^{c\top} (Y_i - \hat{\mu}_0(S_i) - Z_i^\top \hat{\beta})^2 \)
+\end{frame}
+
+\begin{frame}{Dynamic Prediction Setup}
+\begin{itemize}
+  \item Treatment time: \( A \), indicator: \( \delta_T \)
+  \item Event: \( \delta_D \), entry: \( \text{entry}_i \)
+  \item Cross-section \( k \): \( CS_i = k \)
+  \item Landmark time: \( S_{ik} = k \cdot \text{interval} - \text{entry}_i \)
+  \item RMST window: \( Y_{ik} = \min(X_i - S_{ik}, L) \)
+\end{itemize}
+
+\textbf{Weights:}
+\[
+W_{ik} = \frac{\hat{G}_C(S_{ik})}{\hat{G}_C(S_{ik} + Y_{ik})} \cdot 
+\frac{\hat{G}_T(S_{ik})}{\hat{G}_T(S_{ik} + Y_{ik})}
+\]
+\end{frame}
+
+\begin{frame}{Prediction Models}
+\textbf{Link-based RMST model:}
+\[
+\mathbb{E}[Y_{ik} \mid Z_{a,i}, Z_{b,i}] = g^{-1}(Z_{a,i}^\top \alpha + Z_{b,i}^\top \beta_k + \gamma_k)
+\]
+
+\textbf{Stratified additive model:}
+\[
+Y_{ik} = \mu_k + Z_{a,i}^\top \alpha + Z_{b,i}^\top \beta + \varepsilon_{ik}
+\]
+
+\textbf{Cox-type model (log-linear):}
+\[
+\lambda_{ik}(t) = \lambda_{0k}(t) \exp(Z_{a,i}^\top \alpha + Z_{b,i}^\top \beta)
+\]
+\end{frame}
+
+\begin{frame}{Variance Estimation for Prediction}
+\textbf{Sandwich variance:}
+\[
+\hat{V} = A^{-1} \left( \sum_i e_i e_i^\top \right) A^{-\top}
+\]
+
+\textbf{Where } \( e_i \): weighted residuals, and \( A \): derivative matrix
+
+\vspace{1em}
+Robust inference via IPCW even under model misspecification.
+\end{frame}
+
+\begin{frame}{Summary}
+\begin{itemize}
+  \item RMST modeling accommodates censoring and stratification via IPCW
+  \item Landmark-based dynamic prediction captures evolving risk
+  \item Link-based and stratified models both supported
+  \item Variance estimation handled robustly via sandwich estimator
+\end{itemize}
+\end{frame}
+
+\end{document}
