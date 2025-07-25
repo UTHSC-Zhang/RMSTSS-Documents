@@ -1,0 +1,203 @@
+\documentclass{beamer}
+
+\usetheme{Madrid} % You can choose a different theme like AnnArbor, Berlin, etc.
+\usecolortheme{beaver} % Optional: Choose a color theme
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref} % For clickable links
+
+\title{RMSTSS: Sample Size and Power Calculations for RMST-based Clinical Trials}
+\author{Arnab Aich}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section*{Introduction}
+\begin{frame}{Introduction to RMST}
+\begin{itemize}
+    \item \textbf{Challenge with Hazard Ratios (HR):} The Cox proportional hazards model and its hazard ratio (HR) can be difficult to interpret, especially when the proportional hazards assumption is violated.
+    \item \textbf{Restricted Mean Survival Time (RMST):}
+    \begin{itemize}
+        \item A clear and robust alternative.
+        \item Measures average event-free time up to a pre-specified follow-up point (L).
+        \item Provides direct, meaningful measures of treatment benefit (e.g., "an average of 3 extra months of survival over 5 years").
+    \end{itemize}
+    \item \textbf{Direct RMST Modeling:} Modern methods focus on directly modeling RMST as a function of covariates, using Inverse Probability of Censoring Weighting (IPCW).
+    \item \textbf{The \texttt{RMSTSS} Package:} Fills the gap in software for power and sample size calculations based on direct RMST methodologies.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Core Concepts of RMSTSS Package}
+\begin{itemize}
+    \item \textbf{Two Primary Approaches:}
+    \begin{itemize}
+        \item \textbf{Analytic Method (\texttt{.analytical} functions):}
+        \begin{itemize}
+            \item Fast, uses direct mathematical formulas.
+            \item Estimates treatment effect size and asymptotic variance from pilot data.
+            \item Calculates power using a standard formula:
+            $$ \text{Power} = \Phi\left( \frac{|\beta_{\mathrm{effect}}|}{\sigma_N} - z_{1-\alpha/2} \right) $$
+        \end{itemize}
+        \item \textbf{Bootstrap Method (\texttt{.boot} functions):}
+        \begin{itemize}
+            \item Robust, simulation-based, makes fewer distributional assumptions.
+            \item Computationally intensive.
+            \item Simulates "future trials" by resampling pilot data, fits the model, and calculates power as the proportion of significant results.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Sample Size Search Algorithm (\texttt{.ss} functions):}
+    \begin{itemize}
+        \item Iterative search to find the required sample size (\textit{N}) for a \texttt{target\_power}.
+        \item Starts with \texttt{n\_start}, calculates power, increments \texttt{n\_step} until \texttt{target\_power} is met or \texttt{max\_n\_per\_arm} is exceeded.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section*{Models}
+\begin{frame}{Linear IPCW Models}
+\begin{itemize}
+    \item \textbf{Theory and Model:}
+    \begin{itemize}
+        \item Implements the foundational direct linear regression model for RMST.
+        \item Assumes a linear relationship between covariates and RMST.
+        \item Handles right-censoring using Inverse Probability of Censoring Weighting (IPCW).
+        \item Models conditional RMST as: $\mathbb{E}[\min(T_i, L) | Z_i] = \beta_0 + \beta_1 \text{Treatment}_i + \beta_2 \text{Covariate}_{i}$
+    \end{itemize}
+    \item \textbf{Functions Available:}
+    \begin{itemize}
+        \item \texttt{linear.power.analytical}
+        \item \texttt{linear.ss.analytical}
+        \item \texttt{linear.power.boot}
+        \item \texttt{linear.ss.boot}
+    \end{itemize}
+    \item \textbf{Use Case:} Suitable for baseline analyses without strong evidence of non-linear effects or complex stratification.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Additive Stratified Models}
+\begin{itemize}
+    \item \textbf{Theory and Model:}
+    \begin{itemize}
+        \item For multi-center trials or analyses stratified by categorical variables with many levels.
+        \item Assumes the treatment effect is \textbf{additive} and constant across all strata.
+        \item Allows each stratum to have its own unique baseline RMST.
+        \item Model: $\mu_{ij} = \mu_{0j} + \beta'Z_i$
+        \item Uses a stratum-centering approach for efficient estimation.
+    \end{itemize}
+    \item \textbf{Functions Available:}
+    \begin{itemize}
+        \item \texttt{additive.power.analytical}
+        \item \texttt{additive.ss.analytical}
+        \item (Bootstrap methods are not applicable for this model in the package)
+    \end{itemize}
+    \item \textbf{Use Case:} Appropriate for multi-center trials where the treatment effect is expected to be uniform (e.g., a fixed increase in survival time across centers).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Multiplicative Stratified Models}
+\begin{itemize}
+    \item \textbf{Theory and Model:}
+    \begin{itemize}
+        \item Alternative to additive model when treatment is expected to have a \textbf{proportional} effect on RMST.
+        \item Covariates have a multiplicative effect on baseline stratum-specific RMST.
+        \item Model: $\mu_{ij} = \mu_{0j} \exp(\beta'Z_i)$
+        \item Equivalent to a linear model on the log-RMST.
+    \end{itemize}
+    \item \textbf{Functions Available:}
+    \begin{itemize}
+        \item \texttt{MS.power.analytical}
+        \item \texttt{MS.ss.analytical}
+        \item \texttt{MS.power.boot}
+        \item \texttt{MS.ss.boot}
+    \end{itemize}
+    \item \textbf{Use Case:} Preferred in multi-center trials where the treatment is expected to produce proportional gains relative to baseline survival across different centers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Semiparametric GAM Models}
+\begin{itemize}
+    \item \textbf{Theory and Model:}
+    \begin{itemize}
+        \item Addresses non-linear covariate effects on RMST (e.g., age, biomarker levels).
+        \item Uses a bootstrap simulation approach combined with Generalized Additive Models (GAMs).
+        \item Converts time-to-event outcome into \textbf{jackknife pseudo-observations} for RMST.
+        \item Fits a GAM to these pseudo-observations: $\mathbb{E}[\text{pseudo}_i] = \beta_0 + \beta_1 \cdot \text{Treatment}_i + \sum_{k=1}^{q} f_k(\text{Covariate}_{ik})$
+    \end{itemize}
+    \item \textbf{Functions Available:}
+    \begin{itemize}
+        \item \texttt{GAM.power.boot}
+        \item \texttt{GAM.ss.boot}
+        \item (Analytical methods are not applicable for this model in the package)
+    \end{itemize}
+    \item \textbf{Use Case:} Useful when variables are believed to have complex, non-linear associations with the outcome.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dependent Censoring Models}
+\begin{itemize}
+    \item \textbf{Theory and Model:}
+    \begin{itemize}
+        \item Addresses situations where censoring is not independent of the event of interest (competing risks).
+        \item Extends the IPCW framework.
+        \item Fits \textbf{cause-specific Cox models} for each source of censoring.
+        \item Final weight for a subject is a product of weights from all censoring causes.
+        \item Final analysis is a weighted linear regression on the RMST.
+    \end{itemize}
+    \item \textbf{Functions Available:}
+    \begin{itemize}
+        \item \texttt{DC.power.analytical}
+        \item \texttt{DC.ss.analytical}
+        \item (Bootstrap methods are not applicable for this model in the package)
+    \end{itemize}
+    \item \textbf{Use Case:} Recommended for studies involving competing events (e.g., transplant studies where transplant precludes observation of pre-transplant mortality).
+\end{itemize}
+\end{frame}
+
+\section*{Package Features}
+\begin{frame}{Key Features of the \texttt{RMSTSS} Package}
+\begin{itemize}
+    \item \textbf{Comprehensive Toolset:} Provides a wide range of modern statistical methods for RMST-based trial design.
+    \item \textbf{Flexibility:} Handles complex scenarios like stratification, non-linear effects, and competing risks.
+    \item  \textbf{Method Choice:} Offers both fast analytical methods and robust bootstrap methods, balancing speed and distributional flexibility.
+    \item \textbf{Consistent Naming Convention:} Easy to select the correct function based on model type, goal (power/sample size), and method (analytical/boot).
+    \item \textbf{User-Friendly:} Designed to fill the gap where trial statisticians previously needed custom code.
+\end{itemize}
+\end{frame}
+
+\section*{Shiny Application}
+\begin{frame}{Interactive Shiny Application}
+\begin{itemize}
+    \item \textbf{Purpose:} Provides a graphical, point-and-click interface for all models and methods in \texttt{RMSTSS}.
+    \item \textbf{Access:}
+    \begin{itemize}
+        \item Live Web Version (Recommended): \href{https://arnab96.shinyapps.io/uthsc-app/}{Launch Web Application}
+        \item Run Locally from R Package: \texttt{RMSTSS::run\_app()} (if \texttt{RMSTSS-Package} is installed)
+    \end{itemize}
+    \item \textbf{App Features:}
+    \begin{itemize}
+        \item \textbf{Interactive Data Upload:} Upload your pilot dataset in \texttt{.csv} format.
+        \item \textbf{Visual Column Mapping:} Map data columns to required variables (time, status, treatment arm).
+        \item \textbf{Full Model Selection:} Choose RMST model, calculation method, and set parameters via user-friendly controls.
+        \item \textbf{Rich Visualization:} View results including survival plots, power curves, and summary tables within the app.
+        \item \textbf{Downloadable Reports:} Generate and download publication-ready analysis reports in PDF format.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section*{Conclusion}
+\begin{frame}{Conclusion}
+\begin{itemize}
+    \item The \texttt{RMSTSS} package offers a powerful and flexible suite of tools for designing and analyzing clinical trials using the Restricted Mean Survival Time.
+    \item \textbf{Advantages:} Implements a wide range of modern statistical methods, handles complex scenarios, and provides both fast analytical and robust bootstrap options.
+    \item \textbf{Disadvantages:} Relies on representative pilot data for accurate calculations; bootstrap methods can be computationally intensive.
+    \item \textbf{Future Work:} Possible extensions include bootstrap approach for dependent censoring models and advanced model diagnostic tools.
+\end{itemize}
+\end{frame}
+
+\end{document}
