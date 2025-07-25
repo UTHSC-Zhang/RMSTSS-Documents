@@ -15,11 +15,11 @@
 
 \begin{frame}{Overview}
 \begin{itemize}
-    \item Restricted Mean Survival Time (RMST) is a robust, model-free summary measure for time-to-event data:
+    \item Restricted Mean Survival Time (RMST) is a robust, model-free summary measure for time-to-event data: \textcolor{red}{change $\tau$ to L to differentiate with end of study}
     \[
     \mu(\tau) = \mathbb{E}[\min(T, \tau)] = \int_0^\tau S(t) \, dt
     \]
-    \item Unlike the hazard ratio, RMST does not assume proportional hazards.
+    \item Unlike the hazard ratio, RMST does not assume proportional hazards. \textcolor{red}{Conventional modeling of the hazard rate assumes proportional hazards. If RMST is calculated from conventional PH models, then your statement is not true.}
     \item Used increasingly for both inference and design in clinical trials.
     \item This talk focuses on three R packages that support RMST-based estimation or sample size:
     \begin{itemize}
@@ -80,7 +80,7 @@
 % Slide 7 - gsDesign2
 \begin{frame}{gsDesign2 - RMST-Based Design}
 \begin{itemize}
-    \item \texttt{gsDesign2} extends group sequential methods to nonparametric endpoints like RMST.
+    \item \texttt{gsDesign2} extends group sequential methods to nonparametric endpoints like RMST. \textcolor{red}{This package is not as important because it focuses on group sequential design.}
 
     \item Test statistic:
     \[
