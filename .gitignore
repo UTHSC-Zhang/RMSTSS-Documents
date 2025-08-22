@@ -1,3 +1,8 @@
 .Rhistory
 .Rproj.user
 .Rproj
+*.drawio
+*.toc
+*.snm
+*.gz
+*.log
