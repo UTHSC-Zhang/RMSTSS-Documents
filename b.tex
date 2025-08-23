@@ -1,0 +1,270 @@
+\documentclass[11pt, a4paper]{article}
+
+% =============================================================================
+% PREAMBLE
+% =============================================================================
+
+% --- Page Layout & Fonts ---
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage{fontenc}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{lscape} % For landscape pages if needed
+
+% --- Mathematical Tools ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+
+% --- Graphics & Tables ---
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf}
+
+% --- Bibliography ---
+\usepackage[numbers,sort&compress]{natbib}
+\bibliographystyle{plainnat}
+
+% --- Hyperlinks ---
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=red,
+}
+\usepackage{url}
+
+% --- BibTeX file ---
+\usepackage{filecontents}
+\begin{filecontents*}{references.bib}
+@article{royston2013,
+  title={Restricted mean survival time: an alternative to the hazard ratio for summarizing survival data},
+  author={Royston, Patrick and Parmar, Mahesh KB},
+  journal={BMC Medical Research Methodology},
+  volume={13},
+  number={1},
+  pages={1--11},
+  year={2013}
+}
+@article{uno2014,
+  title={Moving beyond the hazard ratio in quantifying the between-group difference in survival analysis},
+  author={Uno, Hajime and Claggett, Brian and Tian, Lu and Inoue, Eisuke and Gallo, Paul and Miyata, Tomoo and Schrag, Deborah and Takeuchi, Masahiro and Pfeffer, Marc A and Solomon, Scott D and others},
+  journal={Journal of Clinical Oncology},
+  volume={32},
+  number={22},
+  pages={2380},
+  year={2014}
+}
+@article{tian2014,
+  title={Predicting the restricted mean survival time with the subject’s baseline covariates in survival analysis},
+  author={Tian, Lu and Zhao, Lihui and Wei, LJ},
+  journal={Biostatistics},
+  volume={15},
+  number={4},
+  pages={715--724},
+  year={2014}
+}
+@article{wang2019,
+  title={Evaluating center (stratum) effects using a multiplicative model for RMST},
+  author={Wang, J. and Haneuse, S. and Parast, L.},
+  journal={Biostatistics},
+  volume={20},
+  number={4},
+  pages={633--648},
+  year={2019}
+}
+@article{zhang2024,
+  title={A semiparametric additive model for restricted mean survival time with a large number of strata},
+  author={Zhang, Yuan and Ma, S.},
+  journal={Biometrics},
+  year={2024}
+}
+@article{wang2018,
+  title={Regression analysis of restricted mean survival time with covariate-dependent censoring},
+  author={Wang, Y. and Ma, X. and Wang, J.},
+  journal={Statistics in Medicine},
+  volume={37},
+  number={1},
+  pages={129--140},
+  year={2018}
+}
+@book{hastie1990,
+  title={Generalized Additive Models},
+  author={Hastie, T.J. and Tibshirani, R.J.},
+  year={1990},
+  publisher={Chapman \& Hall/CRC}
+}
+@article{hastie1986,
+  title={Generalized Additive Models},
+  author={Hastie, Trevor and Tibshirani, Robert},
+  journal={Statistical Science},
+  volume={1},
+  number={3},
+  pages={297--310},
+  year={1986}
+}
+@article{andersen2003,
+  title={Regression analysis of censored data using pseudo-observations},
+  author={Andersen, Per Kragh and Klein, John P and Rosth{\o}j, Steen},
+  journal={Scandinavian Journal of Statistics},
+  volume={30},
+  number={3},
+  pages={539--555},
+  year={2003}
+}
+@article{andersen2010,
+  title={Pseudo-observations in survival analysis},
+  author={Andersen, Per Kragh and Pohar Perme, Maja},
+  journal={Statistical Methods in Medical Research},
+  volume={19},
+  number={1},
+  pages={71--99},
+  year={2010}
+}
+\end{filecontents*}
+
+
+% =============================================================================
+% DOCUMENT START
+% =============================================================================
+
+\begin{document}
+
+\title{\textbf{A Methodological Report on the Statistical Models and Theories Implemented in the RMSTSS Software}}
+\author{Arnab Aich \and Yuan Zhang}
+\date{Department of Preventive Medicine}
+\maketitle
+
+\begin{abstract}
+The \texttt{RMSTSS} software provides a comprehensive toolkit for power and sample size calculation in clinical trials using the Restricted Mean Survival Time (RMST). This report provides a detailed methodological overview of the statistical theories and models that form the foundation of the software. We begin by motivating the use of RMST as a robust alternative to the traditional hazard ratio. We then describe the dual computational frameworks—fast analytical methods and robust bootstrap simulations—that are available to the user. The core of this report is a detailed exposition of each statistical model implemented in the package. This includes the foundational linear model with Inverse Probability of Censoring Weighting (IPCW); advanced semiparametric models for stratified data (both additive and multiplicative); the flexible Generalized Additive Model (GAM) for handling non-linear covariate effects via jackknife pseudo-observations; and the model for adjusting for dependent censoring (competing risks). For each model, we present the theoretical background, mathematical formulation, and the specific estimation techniques employed. This document is intended to serve as a technical reference for users seeking a deeper understanding of the statistical machinery underlying the \texttt{RMSTSS} software.
+\end{abstract}
+
+\clearpage
+
+\section{Introduction: The Case for RMST}
+
+The design and analysis of clinical trials with time-to-event outcomes have traditionally relied on the hazard ratio (HR), typically derived from the Cox proportional hazards model. However, the HR's validity hinges on the proportional hazards (PH) assumption, which is often violated in practice \cite{uno2014}. As an alternative, the Restricted Mean Survival Time (RMST) has gained favor for its straightforward interpretation and robust properties \cite{royston2013}. The RMST measures the average event-free time up to a pre-specified follow-up point, $L$, providing a direct and meaningful measure of treatment benefit (e.g., "an average of 3 extra months of survival over 5 years") that is valid even when the PH assumption does not hold. The \texttt{RMSTSS} software is designed to facilitate the planning of trials based on this robust metric.
+
+\section{Core Computational Frameworks}
+The \texttt{RMSTSS} package offers two distinct computational approaches for power and sample size estimation, allowing users to balance speed and robustness.
+
+\subsection{The Analytical Method}
+The analytical method is a rapid, formula-based approach based on the asymptotic normality of the test statistic for the treatment effect. For a given total sample size $N$, the power is calculated as:
+\begin{equation}
+\text{Power} = \Phi\left( \frac{|\beta_{\text{effect}}|}{\sigma_N} - z_{1-\alpha/2} \right)
+\end{equation}
+where $\Phi$ is the CDF of the standard normal distribution, $\beta_{\text{effect}}$ is the treatment effect estimated from pilot data, $\sigma_N = \sigma_1 / \sqrt{N}$ is the standard error of the effect for the target sample size, and $z_{1-\alpha/2}$ is the critical value. This method is ideal for initial explorations and generating power curves.
+
+\subsection{The Bootstrap Method}
+The bootstrap method is a robust, simulation-based alternative that makes fewer distributional assumptions. It empirically estimates the sampling distribution of the test statistic by repeatedly resampling from the pilot data. The power is then estimated as the proportion of bootstrap simulations in which the null hypothesis is correctly rejected:
+\begin{equation}
+ \text{Power} = \frac{\text{Number of simulations with } p < \alpha}{n_{\text{sim}}}
+\end{equation}
+While computationally intensive, this method provides a more reliable estimate of power, especially for complex models.
+
+\clearpage
+
+\section{Statistical Models and Estimation Techniques}
+
+\subsection{Model 1: Linear IPCW Model}
+\subsubsection{Theoretical Background}
+The foundational model for covariate adjustment in \texttt{RMSTSS} is the linear model with Inverse Probability of Censoring Weighting (IPCW), based on the methodology of Tian et al. \cite{tian2014}. This approach models the conditional RMST as a direct linear function of the treatment and other covariates. This method is particularly powerful because it allows for the estimation of covariate-adjusted treatment effects on the RMST scale, which is often of primary interest in clinical trials. By directly modeling the mean, it avoids the complexities and restrictive assumptions of hazard-based models.
+
+\subsubsection{Mathematical Formulation}
+The model is specified as:
+\begin{equation}
+\mathbb{E} = \beta_0 + \beta' Z_i
+\end{equation}
+Here, the expected RMST up to time $L$ for subject $i$ is modeled as a linear combination of their covariates $Z_i$ (which includes the treatment indicator). The coefficient for the treatment variable directly quantifies the adjusted difference in RMST between the treatment and control groups.
+
+\subsubsection{Estimation Technique: IPCW}
+Since the true event time $T_i$ may be right-censored, we cannot directly use the observed time $Y_i = \min(T_i, C_i)$ as the response. IPCW corrects for this by weighting each observation. Let $G(t) = P(C_i > t)$ be the survival function of the censoring time. The weight for each subject is the inverse of the probability of not being censored by their observed time:
+\begin{equation}
+w_i = \frac{\delta_i}{\hat{G}(Y_i)}
+\end{equation}
+where $\delta_i$ is the event indicator (1 if event, 0 if censored), and $\hat{G}(t)$ is estimated using the Kaplan-Meier method on the censoring distribution (i.e., treating censoring as the "event"). A standard weighted least squares regression is then fitted to estimate the $\beta$ coefficients. The variance of the estimators is calculated using a robust sandwich estimator to account for the weighting.
+
+\clearpage
+
+\subsection{Model 2: Stratified Models for Multi-Center Trials}
+\subsubsection{Theoretical Background}
+Clinical trials are often conducted across multiple centers, which can be treated as strata. \texttt{RMSTSS} implements two powerful semiparametric models to handle such data efficiently, avoiding the potential for biased estimates that can arise from ignoring stratification.
+
+\subsubsection{Additive Stratified Model}
+This model, developed by Zhang et al. \cite{zhang2024}, assumes that the treatment effect is additive and constant across strata, while allowing each stratum to have a unique baseline RMST. This is a common and plausible assumption in many multi-center trials.
+\begin{itemize}
+    \item \textbf{Mathematical Formulation}:
+    \begin{equation}
+    \mu_{ij} = \mu_{0j} + \beta'Z_i
+    \end{equation}
+    where $\mu_{ij}$ is the RMST for subject $i$ in stratum $j$, and $\mu_{0j}$ is the baseline RMST for stratum $j$.
+    \item \textbf{Estimation Technique}: The common effect $\beta$ is estimated efficiently via a \textbf{stratum-centering} approach on the IPCW-weighted data. This involves de-meaning the outcome and covariates within each stratum before pooling the data for regression, which avoids the direct estimation of the numerous $\mu_{0j}$ parameters.
+\end{itemize}
+
+\subsubsection{Multiplicative Stratified Model}
+This model, based on the work of Wang et al. \cite{wang2019}, assumes that covariates have a multiplicative effect on the stratum-specific baseline RMST. This may be a more appropriate model if the treatment effect is expected to be proportional to the baseline prognosis.
+\begin{itemize}
+    \item \textbf{Mathematical Formulation}:
+    \begin{equation}
+    \mu_{ij} = \mu_{0j} \exp(\beta'Z_i)
+    \end{equation}
+    This is equivalent to a linear model on the log-RMST: $\log(\mu_{ij}) = \log(\mu_{0j}) + \beta'Z_i$.
+    \item \textbf{Estimation Technique}: The package uses a practical and efficient approximation by fitting a weighted log-linear model to estimate the log-RMST ratio, $\beta$.
+\end{itemize}
+
+\clearpage
+
+\subsection{Model 3: Semiparametric GAM Model}
+\subsubsection{Theoretical Background}
+In many clinical contexts, the relationship between a continuous covariate (e.g., a biomarker) and the outcome is not linear. Generalized Additive Models (GAMs) \cite{hastie1986, hastie1990} extend the linear model by allowing non-linear functions of covariates to be estimated from the data. However, GAMs cannot directly handle censored data. The solution is to use jackknife pseudo-observations \cite{andersen2003}.
+
+\subsubsection{Estimation Technique: Jackknife Pseudo-Observations}
+This technique transforms the censored survival data into a complete set of "pseudo" response values that can be analyzed with standard regression methods \cite{andersen2010}.
+\begin{enumerate}
+    \item \textbf{Estimate the RMST from the full dataset}, $\hat{\mu} = \int_0^L \hat{S}(t) dt$.
+    \item \textbf{Estimate the "leave-one-out" RMST}, $\hat{\mu}_{(-i)}$, for each subject $i$ removed from the dataset.
+    \item \textbf{Calculate the jackknife pseudo-observation} for subject $i$:
+    \begin{equation}
+    \tilde{\mu}_i = n \cdot \hat{\mu} - (n-1) \cdot \hat{\mu}_{(-i)}
+    \end{equation}
+\end{enumerate}
+This process yields a complete vector of $n$ pseudo-observations, $(\tilde{\mu}_1,..., \tilde{\mu}_n)$, which can be used as the response variable.
+
+\subsubsection{Mathematical Formulation}
+The complete GAM for the RMST is specified as:
+\begin{equation}
+E[\tilde{\mu}_i | Z_i] = \beta_0 + \beta_1 \cdot \text{Treatment}_i + \sum_{k=1}^{q} f_k(\text{Covariate}_{ik})
+\end{equation}
+Here, the expected value of the pseudo-observation is modeled as a sum of a linear effect for the treatment and a series of smooth, non-linear functions, $f_k(\cdot)$, for the continuous covariates. Due to the complexity of this multi-stage model, power calculations are performed exclusively via the bootstrap method.
+
+\clearpage
+
+\subsection{Model 4: Dependent Censoring Model}
+\subsubsection{Theoretical Background}
+Standard survival analysis assumes that censoring is independent of the event of interest. In studies with competing risks (e.g., death from other causes), this assumption is violated. \texttt{RMSTSS} implements the method proposed by Wang et al. \cite{wang2018} to handle this dependent censoring. Failure to account for competing risks can lead to severely biased estimates of treatment effect.
+
+\subsubsection{Mathematical Formulation}
+The final analysis still uses a weighted linear model for the RMST:
+\begin{equation}
+\mathbb{E} = \beta_0 + \beta' Z_i
+\end{equation}
+However, the calculation of the IPCW weights is extended to handle the competing risks.
+
+\subsubsection{Estimation Technique: Cause-Specific Weights}
+Instead of one model for the overall censoring distribution, **cause-specific Cox models** are fitted for each of the $K$ sources of censoring. The final weight for each subject is then calculated as a product of weights derived from these models:
+\begin{equation}
+W_i = \exp\left(\sum_{k=1}^{K} \hat{\Lambda}_{k}(Y_i)\right)
+\end{equation}
+where $\hat{\Lambda}_{k}$ is the estimated cumulative hazard for censoring cause $k$. The final analysis is a weighted linear regression, and power calculations use a robust sandwich estimator for the variance to properly account for the multiple weighting components.
+
+\section{Conclusion}
+The \texttt{RMSTSS} software provides a robust and comprehensive platform for designing modern clinical trials. This report has detailed the statistical theory and estimation techniques for each of the advanced models implemented in the package. By offering a range of methods—from linear models to flexible GAMs and models for complex data structures like stratified or competing risks data—\texttt{RMSTSS} equips researchers with the necessary tools to plan statistically sound and efficient studies based on the clinically meaningful RMST metric.
+
+\bibliography{references}
+
+\end{document}
