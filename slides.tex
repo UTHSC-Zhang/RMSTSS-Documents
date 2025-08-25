@@ -1,18 +1,24 @@
 \documentclass{beamer}
 
 % Theme and Color Scheme
-\usetheme{Madrid}
-\usecolortheme{default}
+\usetheme{Boadilla}
+\usecolortheme{seahorse}
+\setbeamersize{text margin left=0.5cm, text margin right=0.5cm}
+\setbeamertemplate{footline}{} % Remove footer
+\date{}
 
 % Required Packages
 \usepackage{graphicx} % For including images
 \usepackage{amsmath}  % For advanced math environments
+\usepackage{amssymb}
 \usepackage{booktabs} % For professional tables
+\usepackage[numbers,sort&compress]{natbib} % For citations
+\usepackage{qrcode} % For QR codes
 
 % Title Page Information
-\title{RMSTSS: A Comprehensive Software Suite for Power and Sample Size Calculation in Modern Clinical Trials}
-\author{Arnab Aich, Yuan Zhang}
-\institute{Department of Preventive Medicine, UTHSC}
+\title[RMSTSS]{RMSTSS: A Comprehensive Software Suite for Power and Sample Size Calculation in Modern Clinical Trials}
+\author{Arnab Aich}
+\institute{Florida State University}
 \date{\today}
 
 \begin{document}
@@ -58,17 +64,14 @@ In many trials, the outcome is the \textbf{time until an event} occurs (e.g., re
     \item We observe $Y = \min(T, C)$ and an event indicator $\delta$.
     \item \textbf{Survival Function}, $S(t) = P(T > t)$: The probability of surviving past time $t$.
     \item \textbf{Hazard Function}, $h(t)$: The instantaneous risk of the event at time $t$, given survival up to $t$.
-    $$h(t) = \lim_{\Delta t \to 0} \frac{P(t \le T < t + \Delta t \mid T \ge t)}{\Delta t}$$
+    $$h(t) = \lim_{\Delta t \to 0} \frac{P(t \le T < t + \Delta t \mid T \ge t)}{\Delta t} = \frac{f(t)}{S(t)}$$
 \end{itemize}
 \end{block}
-Traditionally, the treatment effect is quantified by the \textbf{Hazard Ratio (HR)}.
 \end{frame}
 
 % Frame 4: The Proportional Hazards (PH) Assumption
 \begin{frame}
 \frametitle{The Proportional Hazards (PH) Assumption}
-The Cox model and the Hazard Ratio rely on a critical assumption: \textbf{Proportional Hazards}.
-
 \begin{block}{What does this mean?}
 The hazard in the treatment group is a constant multiple of the hazard in the control group at all points in time.
 $$h_1(t) = h_0(t) \cdot \theta$$
@@ -77,11 +80,9 @@ This implies the treatment provides a \textbf{constant relative risk reduction} 
 
 \begin{columns}
 \begin{column}{0.5\textwidth}
-    \textbf{When PH Holds:}
     \includegraphics[width=\textwidth]{images/ph_assumption_met.png}
 \end{column}
 \begin{column}{0.5\textwidth}
-    \textbf{When PH is Violated:}
     \includegraphics[width=\textwidth]{images/ph_assumption_violated.png}
 \end{column}
 \end{columns}
@@ -91,7 +92,7 @@ This implies the treatment provides a \textbf{constant relative risk reduction} 
 \begin{frame}
 \frametitle{Problems with the Hazard Ratio}
 \begin{enumerate}
-    \item \textbf{The PH Assumption is Often Violated} \cite{[1]}
+    \item \textbf{The PH Assumption is Often Violated}
     \begin{itemize}
         \item Modern therapies (e.g., immunotherapies) often have \textbf{delayed effects}.
         \item Treatment benefits may \textbf{wear off} over time.
@@ -101,7 +102,7 @@ This implies the treatment provides a \textbf{constant relative risk reduction} 
     \item \textbf{Lack of a Clear Causal Interpretation}
     \begin{itemize}
         \item When the PH assumption fails, the single HR value from a Cox model becomes a complex, time-averaged summary.
-        \item It loses its clear meaning as a constant relative risk, making it difficult to interpret the true clinical benefit \cite{[1]}.
+        \item It loses its clear meaning as a constant relative risk, making it difficult to interpret the true clinical benefit \cite{uno2014}.
     \end{itemize}
 \end{enumerate}
 \end{frame}
@@ -110,15 +111,15 @@ This implies the treatment provides a \textbf{constant relative risk reduction} 
 \begin{frame}
 \frametitle{The Solution: Restricted Mean Survival Time (RMST)}
 \begin{block}{Definition}
-The RMST is the average event-free survival time up to a pre-specified time point, $L$. It is the area under the survival curve from 0 to $L$ \cite{[1]}.
-$$\mu(L) = E = \int_0^L S(t) dt$$
+The RMST is the average event-free survival time up to a pre-specified time point, $L$. It is the area under the survival curve from 0 to $L$.
+$$\mu(L) = E[\min(T, L)] = \int_0^L S(t) dt$$
 \end{block}
 
 \begin{block}{Interpretation \& Advantages}
 \begin{itemize}
-    \item \textbf{Directly Interpretable:} It provides a clear, absolute measure of survival in units of time (e.g., "an average of 3 months of additional survival over 5 years") \cite{[1, 1]}.
-    \item \textbf{No Proportional Hazards Assumption:} The RMST is a non-parametric measure, making it a valid and robust choice even when survival curves cross \cite{[1]}.
-    \item \textbf{Clinically Meaningful:} It quantifies the average time gained or lost, which is highly relevant to both clinicians and patients \cite{[1]}.
+    \item \textbf{Directly Interpretable:} It provides a clear, absolute measure of survival in units of time (e.g., "an average of 3 months of additional survival over 5 years").
+    \item \textbf{No Proportional Hazards Assumption:} The RMST is a non-parametric measure, making it a valid and robust choice even when survival curves cross.
+    \item \textbf{Clinically Meaningful:} It quantifies the average time gained or lost, which is highly relevant to both clinicians and patients.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -132,319 +133,427 @@ The treatment effect is quantified as the difference in RMST between the two arm
 $$\Delta(L) = \mu_{\text{treatment}}(L) - \mu_{\text{control}}(L)$$
 \end{block}
 
-\begin{columns}
-\begin{column}{0.5\textwidth}
 \textbf{Interpretation:}
 \begin{itemize}
     \item $\Delta(L)$ represents the \textbf{average gain in event-free time} attributable to the treatment over the time period $[0, L]$.
-    \item This provides a direct answer to the question: "On average, how much longer did patients on the new treatment live without an event during the study period?"
+    \item This provides a direct answer to the question:
+    \\
+    \textit{On average, how much longer did patients on the new treatment live without an event during the study period?}
 \end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
-\includegraphics[width=\textwidth]{images/rmst_causal_plot.png}
-\end{column}
-\end{columns}
 \end{frame}
 
-% Frame 5: Direct Regression Modeling of RMST
+% Frame 8: Causal Interpretation of RMST (Both Scenarios)
 \begin{frame}
-\frametitle{Direct Regression Modeling of RMST}
-Instead of estimating survival curves first, we can model the RMST directly as a function of covariates, $Z_i$.
-
-\begin{block}{The General Model Structure}
-$$g(E[\mu_i | Z_i]) = \beta_0 + \beta'Z_i$$
+\frametitle{Causal Interpretation of RMST}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{block}{PH Met Case}
+The RMST provides an intuitive measure of the average survival benefit.
 \end{block}
-\begin{itemize}
-    \item $\mu_i$ is the RMST for subject $i$.
-    \item $Z_i$ is a vector of covariates (e.g., treatment arm, age, biomarkers).
-    \item $g(\cdot)$ is a link function (e.g., identity for additive effects, log for multiplicative effects).
-\end{itemize}
-\vspace{1em}
-\textbf{Handling Censoring}:
-\begin{itemize}
-    \item These models use \textbf{Inverse Probability of Censoring Weighting (IPCW)} to correct for right-censoring, providing unbiased estimates of the $\beta$ coefficients \cite{[1]}.
-\end{itemize}
+\includegraphics[width=\textwidth, height = 0.8\textwidth]{images/rmst_causal_plot_ph_met.png}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{block}{PH Violated Case}
+Even with crossing curves, the RMST gives a valid summary of the net effect.
+\end{block}
+\includegraphics[width=\textwidth, height = 0.8\textwidth]{images/rmst_causal_plot_ph_violated.png}
+\end{column}
+\end{columns}
+
+\textit{The treatment effect is the difference in area between the two shaded regions.}
+
 \end{frame}
 
 % --- Part 2: The RMSTSS Package: Models & Methods ---
 \section{The RMSTSS Package: Models \& Methods}
 
-% Frame 6: The RMSTSS R Package Ecosystem
+% Frame 9: Overview of Implemented Models
 \begin{frame}
-\frametitle{The `RMSTSS` R Package Ecosystem}
-`RMSTSS` is designed to bridge the gap between advanced statistical methods and practical trial design \cite{[1]}. It consists of two main components:
-\begin{enumerate}
-    \item \textbf{The R Package}: A powerful, scriptable backend for statisticians and methodologists who need flexibility and reproducibility.
-    \item \textbf{The Shiny Application}: An intuitive, graphical frontend for a broader audience of researchers and clinicians who prefer a no-code solution.
-\end{enumerate}
+\frametitle{Overview of Implemented Models}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{images/app-models.png}
+\end{figure}
 \end{frame}
 
-% Frame 7: Core Computational Approaches
-\begin{frame}
-\frametitle{Core Computational Approaches}
-`RMSTSS` offers two distinct methods for calculation, allowing users to balance speed and robustness \cite{[1]}.
 
-\begin{block}{1. Analytic (`.analytical`)}
+% --- Part 3: Non-Stratified Models ---
+
+% ---------- Frame 11 ----------
+\begin{frame}
+\frametitle{Notation for Estimation Slides}
+
+\begin{block}{Observed Data}
+For subject $i=1,\dots,n$:
 \begin{itemize}
-    \item \textbf{How it works}: Uses a direct mathematical formula based on the asymptotic variance of the treatment effect.
-    $$\text{Power} = \Phi\left( \frac{|\beta_{\text{effect}}|}{\sigma_N} - z_{1-\alpha/2} \right)$$
-    \item \textbf{Advantages}: Extremely fast, ideal for quickly exploring multiple design scenarios.
+  \item $T_i$: true event time
+  \item $C_i$: censoring time
+  \item $Y_i = \min(T_i, C_i)$: observed follow-up time
+  \item $\delta_i = \mathbb{1}(T_i \le C_i)$: event indicator
+  \item $A_i \in \{0,1\}$: treatment group (1 = treatment, 0 = control)
+  \item $Z_i$: baseline covariates
 \end{itemize}
 \end{block}
 
-\begin{block}{2. Bootstrap (`.boot`)}
+\begin{block}{Restricted Mean Survival Time}
+At restriction time $L$, the RMST is
+\[
+\mu(L) = E[\min(T,L)] = \int_0^L S(t)\,dt.
+\]
+\end{block}
+
+\end{frame}
+
+% ---------- Frame 12 ----------
+\begin{frame}
+\frametitle{Linear Model for RMST}
+
+\begin{block}{Model}
+We assume the conditional mean RMST is linear in treatment and covariates:
+\[
+E[\min(T_i,L) \mid A_i, Z_i] = \beta_0 + \beta_A A_i + \beta_Z^\top Z_i.
+\]
+\end{block}
+
+\begin{block}{Target Estimand}
+\[
+\beta_A = \text{adjusted difference in RMST between treatment arms}.
+\]
+\end{block}
+
+
+\begin{block}{Problem}
+We cannot directly regress $Y_i$ on $(A_i,Z_i)$, because:
 \begin{itemize}
-    \item \textbf{How it works}: A robust, simulation-based method that repeatedly resamples from the pilot data.
-    $$\text{Power} = \frac{\text{Number of simulations with } p < \alpha}{n_{\text{sim}}}$$
-    \item \textbf{Advantages}: Makes fewer distributional assumptions, highly robust.
+  \item If $\delta_i=0$, $Y_i$ is censored, not equal to $T_i$.
+  \item $\min(T_i,L)$ is only partially observed when censoring occurs before $L$.
 \end{itemize}
 \end{block}
+
+\begin{block}{Solution}
+We adjust for censoring using \textbf{Inverse Probability of Censoring Weights (IPCW)}.
+\end{block}
+
 \end{frame}
 
-% Frame 8: Model 1: Linear IPCW Model
+% ---------- Frame 14 ----------
 \begin{frame}
-\frametitle{Model 1: Linear IPCW Model}
-\begin{block}{Use Case}
-Standard trial designs where a linear relationship between covariates and RMST is assumed. Based on Tian et al. (2014) \cite{[1]}.
+\frametitle{Estimation with IPCW}
+
+\begin{block}{Censoring Distribution}
+Let $G(t) = P(C_i > t)$ be the survival function of censoring time.  
+We estimate $\widehat{G}(t)$ using Kaplan–Meier (or Cox if $G$ depends on covariates).
 \end{block}
 
-\begin{block}{Mathematical Model}
-The conditional RMST is modeled as a linear function of covariates $Z_i$:
-$$E = \beta_0 + \beta' Z_i$$
+\begin{block}{Weights}
+Each subject receives weight
+\[
+w_i = \frac{\delta_i}{\widehat{G}(Y_i)}.
+\]
 \end{block}
+
+\begin{block}{Weighted Least Squares}
+Estimate $\beta$ by minimizing
+\[
+\widehat{\beta} = \arg\min_\beta \sum_{i=1}^n w_i \Big\{ Y_i - (\beta_0 + \beta_A A_i + \beta_Z^\top Z_i)\Big\}^2.
+\]
+\end{block}
+
 \end{frame}
 
-% Frame 9: Estimation for Linear Model: IPCW
+% ---------- Frame 15 ----------
 \begin{frame}
-\frametitle{Estimation for Linear Model: IPCW}
-\begin{block}{The Challenge of Censoring}
-We observe $Y_i = \min(T_i, C_i)$ and an event indicator $\delta_i$. We cannot directly regress $Y_i$ on $Z_i$.
+\frametitle{Pseudo-Observations for RMST}
+
+\begin{block}{Idea}
+Instead of weighted regression, we create \textbf{pseudo-observations} for each subject.
 \end{block}
 
-\begin{block}{The IPCW Solution}
+\begin{block}{Definition}
+Let $\widehat{\mu}(L)$ = RMST estimate from full sample,  
+$\widehat{\mu}^{(-i)}(L)$ = RMST estimate with subject $i$ removed.  
+Then
+\[
+\text{pseudo}_i(L) = n \cdot \widehat{\mu}(L) - (n-1)\cdot \widehat{\mu}^{(-i)}(L).
+\]
+\end{block}
+
+\begin{block}{Property}
+$E[\text{pseudo}_i(L)] = E[\min(T_i,L)]$.  
+Thus pseudo-observations can be treated as uncensored outcomes.
+\end{block}
+
+\end{frame}
+
+% ---------- Frame 16 ----------
+\begin{frame}
+\frametitle{Semiparametric GAM Model}
+
+\begin{block}{Model}
+We fit a Generalized Additive Model (GAM) to pseudo-observations:
+\[
+E[\text{pseudo}_i(L)] = \beta_0 + \beta_A A_i + \sum_{k=1}^q f_k(Z_{ik}),
+\]
+where $f_k(\cdot)$ are smooth spline functions.
+\end{block}
+
+\begin{block}{Estimand}
+$\beta_A$: adjusted difference in RMST,  
+allowing for non-linear effects of covariates.
+\end{block}
+
+\end{frame}
+
+% ---------- Frame 18 ----------
+\begin{frame}
+\frametitle{Stratified Models}
+
+\begin{block}{Additive Model}
+Assume each stratum $j$ has its own baseline $\alpha_j$, with a common treatment effect:
+\[
+E[\min(T_i,L) \mid A_i, S_i=j] = \alpha_j + \beta_A A_i + \beta_Z^\top Z_i.
+\]
+Interpretation: $\beta_A$ is the constant added survival time across strata.
+\end{block}
+
+\begin{block}{Multiplicative Model}
+Assume proportional treatment effect across strata:
+\[
+E[\min(T_i,L) \mid A_i, S_i=j] = \mu_{0j}(L) \cdot \exp(\beta_A A_i + \beta_Z^\top Z_i).
+\]
+Interpretation: $\exp(\beta_A)$ is the RMST ratio (treatment vs. control), common across strata.
+\end{block}
+
+\end{frame}
+
+% ---------- Frame 17 ----------
+\begin{frame}
+\frametitle{Dependent Censoring}
+
+\begin{block}{Problem}
+If censoring depends on covariates, a single $\widehat{G}(t)$ is biased.
+\end{block}
+
+\begin{block}{Solution: Cause-Specific Models}
+For $K$ censoring causes, fit cause-specific hazards $\lambda_{Ck}(t \mid Z)$ and cumulative hazards $\Lambda_{Ck}(t \mid Z)$.  
+Then
+\[
+\widehat{G}(t \mid Z) = \exp\!\Big(-\sum_{k=1}^K \widehat{\Lambda}_{Ck}(t \mid Z)\Big).
+\]
+\end{block}
+
+\begin{block}{IPCW with Dependent Censoring}
+Use $\widehat{G}(t \mid Z)$ in the IPCW weights.
+\end{block}
+
+\end{frame}
+
+% --- Part 6: Software & Conclusion ---
+% ---------- Frame 19 ----------
+\begin{frame}
+\frametitle{Core Computational Approaches for Power and Sample Size}
+
+\begin{block}{Analytical Approach}
+Uses asymptotic variance of the estimated treatment effect:
+\[
+\text{Power} = 
+\Phi\!\left( 
+\frac{|\widehat{\beta}_A|}{\widehat{\sigma}_{\beta_A}/\sqrt{n}} - z_{1-\alpha/2}
+\right),
+\]
+where $\widehat{\sigma}_{\beta_A}$ is the estimated standard error and $\Phi$ is the standard normal CDF.
+\end{block}
+
+\begin{block}{Bootstrap Approach}
+Simulation-based resampling from pilot data:
+\[
+\text{Power} =
+\frac{\#\{\text{replicates with $p$-value} < \alpha\}}{B},
+\]
+where $B$ = number of bootstrap replicates.
+\end{block}
+
+\end{frame}
+
+% ---------- Frame 20 ----------
+\begin{frame}
+\frametitle{Package Functionality \& Naming Convention}
+
+Functions follow a consistent naming format:
+\[
+\texttt{model.goal.method()}
+\]
+
 \begin{itemize}
-    \item Let $G(t) = P(C_i > t)$ be the survival function of the censoring time.
-    \item The weight for an uncensored subject ($\delta_i=1$) is the inverse of the probability of not being censored by their event time:
-    $$w_i = \frac{\delta_i}{\hat{G}(Y_i)}$$
-    \item $\hat{G}(t)$ is estimated using the Kaplan-Meier method on the censoring distribution.
-    \item A standard weighted least squares regression is then fitted.
+  \item \textbf{Model:} \texttt{linear}, \texttt{GAM}, \texttt{DC}, \texttt{additive}, \texttt{MS}
+  \item \textbf{Goal:} \texttt{power} (estimate power) or \texttt{ss} (sample size for target power)
+  \item \textbf{Method:} \texttt{analytical} or \texttt{boot}
 \end{itemize}
+
+\begin{block}{Example}
+\texttt{MS.ss.boot()}  
+$\Rightarrow$ Sample size calculation for Multiplicative Stratified model, via bootstrap.
 \end{block}
+
 \end{frame}
 
-% Frame 10: Model 2: Stratified Models for Multi-Center Trials
-\begin{frame}
-\frametitle{Model 2: Stratified Models for Multi-Center Trials}
-\begin{block}{Use Case}
-Trials with a large number of strata, such as clinical centers, where estimating a separate parameter for each stratum is inefficient \cite{[1]}.
-\end{block}
-Two main approaches are supported:
-\begin{itemize}
-    \item \textbf{Additive Model}: Assumes a constant treatment benefit across strata.
-    \item \textbf{Multiplicative Model}: Assumes a proportional treatment benefit across strata.
-\end{itemize}
-\end{frame}
-
-% Frame 11: Additive Stratified Model
-\begin{frame}
-\frametitle{Additive Stratified Model}
-\begin{block}{Use Case}
-The treatment is expected to add a constant amount of survival time across all strata. Based on Zhang et al. (2024) \cite{[1]}.
-\end{block}
-\begin{block}{Mathematical Model}
-The model allows each stratum $j$ to have its own baseline RMST ($\mu_{0j}$), with a common treatment effect $\beta$:
-$$\mu_{ij} = \mu_{0j} + \beta'Z_i$$
-\end{block}
-\begin{block}{Estimation}
-The common effect $\beta$ is estimated efficiently via a \textbf{stratum-centering} approach on the IPCW-weighted data, which avoids direct estimation of the numerous $\mu_{0j}$ parameters.
-\end{block}
-\end{frame}
-
-% Frame 12: Multiplicative Stratified Model
-\begin{frame}
-\frametitle{Multiplicative Stratified Model}
-\begin{block}{Use Case}
-The treatment is expected to multiply survival time proportionally across strata. Based on Wang et al. (2019) \cite{[1]}.
-\end{block}
-\begin{block}{Mathematical Model}
-The covariates have a multiplicative effect on the stratum-specific baseline RMST:
-$$\mu_{ij} = \mu_{0j} \exp(\beta'Z_i)$$
-This is equivalent to a linear model on the log-RMST:
-$$\log(\mu_{ij}) = \log(\mu_{0j}) + \beta'Z_i$$
-\end{block}
-\begin{block}{Estimation}
-The package uses a practical and efficient approximation by fitting a weighted log-linear model.
-\end{block}
-\end{frame}
-
-% Frame 13: Model 3: Semiparametric GAM Model
-\begin{frame}
-\frametitle{Model 3: Semiparametric GAM Model}
-\begin{block}{Use Case}
-When a covariate, such as age or a biomarker level, is expected to have a non-linear effect on the RMST \cite{[1]}.
-\end{block}
-\begin{block}{Mathematical Model}
-A Generalized Additive Model (GAM) is used, modeling non-linear relationships with smooth functions (splines), $f_k()$:
-$$ E[\text{pseudo}_i] = \beta_0 + \beta_1 \cdot \text{Treatment}_i + \sum_{k=1}^{q} f_k(\text{Covariate}_{ik}) $$
-\end{block}
-\end{frame}
-
-% Frame 14: Estimation for GAM Model: Pseudo-Observations
-\begin{frame}
-\frametitle{Estimation for GAM Model: Pseudo-Observations}
-\begin{block}{The Challenge}
-Standard regression models like GAMs cannot directly handle censored time-to-event data.
-\end{block}
-\begin{block}{The Solution: Jackknife Pseudo-Observations}
-\begin{enumerate}
-    \item The time-to-event outcome is converted into a continuous, uncensored variable called a **pseudo-observation**.
-    \item Let $\hat{\mu}$ be the RMST estimated from the full sample of size $n$, and $\hat{\mu}_{(-i)}$ be the RMST estimated from the sample with subject $i$ removed.
-    \item The pseudo-observation for subject $i$ is:
-    $$\text{pseudo}_i = n \cdot \hat{\mu} - (n-1) \cdot \hat{\mu}_{(-i)}$$
-    \item The GAM is then fitted to these pseudo-observations.
-\end{enumerate}
-\end{block}
-\end{frame}
-
-% Frame 15: Model 4: Dependent Censoring Model
-\begin{frame}
-\frametitle{Model 4: Dependent Censoring Model}
-\begin{block}{Use Case}
-Studies with competing risks, where censoring may not be independent of the event of interest (e.g., receiving a transplant precludes pre-transplant death). Based on Wang et al. (2018) \cite{[1]}.
-\end{block}
-\begin{block}{Mathematical Model}
-The final analysis still uses a weighted linear model for the RMST:
-$$E = \beta_0 + \beta' Z_i$$
-However, the calculation of the IPCW weights is extended to handle the dependent censoring.
-\end{block}
-\end{frame}
-
-% Frame 16: Estimation for Dependent Censoring Model
-\begin{frame}
-\frametitle{Estimation for Dependent Censoring Model}
-\begin{block}{The Challenge}
-A single censoring distribution is no longer sufficient.
-\end{block}
-\begin{block}{The Solution: Cause-Specific Weights}
-\begin{itemize}
-    \item Instead of one model for the overall censoring distribution, **cause-specific Cox models** are fitted for each of the $K$ sources of censoring.
-    \item The final weight for a subject is a product of the weights derived from all censoring causes, calculated as \cite{[1]}:
-    $$W_i = \exp\left(\sum_{k=1}^{K} \hat{\Lambda}_{k}(Y_i)\right)$$
-    where $\hat{\Lambda}_{k}$ is the estimated cumulative hazard for censoring cause $k$.
-\end{itemize}
-\end{block}
-\end{frame}
-
-% Frame 17: Package Functionality & Naming
-\begin{frame}
-\frametitle{Package Functionality \& Naming}
-The package uses a consistent and predictable `model.goal.method` naming convention, making it easy to find the right function.
-\begin{itemize}
-    \item \textbf{Choose a `model`}: \texttt{linear}, \texttt{additive}, \texttt{MS}, \texttt{GAM}, \texttt{DC}
-    \item \textbf{Choose a `goal`}:
-    \begin{itemize}
-        \item \texttt{power}: To calculate power for given sample sizes.
-        \item \texttt{ss}: To find the sample size for a target power.
-    \end{itemize}
-    \item \textbf{Choose a `method`}:
-    \begin{itemize}
-        \item \texttt{analytical}: For the fast, formula-based approach.
-        \item \texttt{boot}: For the robust, simulation-based approach.
-    \end{itemize}
-\end{itemize}
-\vspace{1em}
-\textbf{Example}: To find the \textbf{s}ample \textbf{s}ize for the \textbf{m}ultiplicative \textbf{s}tratified model using the \textbf{boot}strap method, you would call \texttt{MS.ss.boot()}.
-\end{frame}
-
-% Frame 18: Using the R Package: An Example
+% ---------- Frame 21 ----------
 \begin{frame}[fragile]
-\frametitle{Using the R Package: An Example}
-Calculating the required sample size for a multi-center trial using the additive stratified model is straightforward.
+\frametitle{Worked Example: Additive Stratified Model}
 
 \begin{block}{Scenario}
-Using the `colon` dataset, we want to find the sample size per stratum (`extent`) to achieve 80\% power, with a truncation time of 5 years (1825 days).
+Multi-center trial from \texttt{colon} dataset.  
+Goal: Required sample size per stratum to achieve $80\%$ power, truncation time $L = 1825$ days (5 years).
 \end{block}
 
 \begin{block}{R Code}
 \begin{verbatim}
-# Load and prepare data
 library(survival)
 library(RMSTSS)
-colon_death <- colon[colon$etype == 2, ] %>% 
-  na.omit()
+
+# Prepare pilot data
+colon_death <- colon[colon$etype == 2, ] %>% na.omit()
 colon_death$arm <- ifelse(colon_death$rx == "Obs", 0, 1)
 colon_death$strata <- factor(colon_death$extent)
 
-# Run the sample size calculation
+# Sample size calculation
 ss_results <- additive.ss.analytical(
   pilot_data = colon_death,
-  time_var = "time", status_var = "status", 
-  arm_var = "arm", strata_var = "strata", 
-  target_power = 0.80, L = 1825
+  time_var   = "time",
+  status_var = "status",
+  arm_var    = "arm",
+  strata_var = "strata",
+  target_power = 0.80,
+  L = 1825
 )
 
-# View results and plot
 print(ss_results$results_data)
 \end{verbatim}
 \end{block}
+
 \end{frame}
 
-% --- Part 3: The RMSTSS Shiny Application ---
-\section{The RMSTSS Shiny Application}
+% ---------- Frame 22 ----------
+\begin{frame}[fragile]
+\frametitle{Worked Example: Bootstrap Sample Size Calculation}
 
-% Frame 19: The `RMSTSS` Shiny Application
+\begin{block}{Scenario}
+Same multi-center trial from the \texttt{colon} dataset.  
+Goal: Required sample size per stratum to achieve $80\%$ power at $L = 1825$ days,  
+using the \textbf{bootstrap method}.
+\end{block}
+
+\begin{block}{R Code}
+\scriptsize
+\begin{verbatim}
+# Sample size calculation using bootstrap method
+ss_boot <- additive.ss.boot(
+  pilot_data   = colon_death,
+  time_var     = "time",
+  status_var   = "status",
+  arm_var      = "arm",
+  strata_var   = "strata",
+  target_power = 0.80,
+  L            = 1825,
+  n_boot       = 500   # number of bootstrap replicates
+)
+
+print(ss_boot$results_data)
+\end{verbatim}
+\end{block}
+
+\begin{block}{Interpretation}
+The bootstrap approach directly simulates variability from pilot data,  
+providing a more robust estimate of sample size under complex censoring patterns.
+\end{block}
+\end{frame}
+
+
+% ---------- Frame 22 ----------
 \begin{frame}
-\frametitle{The `RMSTSS` Shiny Application}
-The Shiny application makes the full power of the `RMSTSS` package accessible through an intuitive graphical interface \cite{[1]}.
+\frametitle{The \texttt{RMSTSS} Shiny Application}
 
-\textbf{Key Features} \cite{[1]}:
+\begin{block}{Key Features}
 \begin{itemize}
-    \item \textbf{Easy Data Upload}: Start by uploading your pilot data in a standard `.csv` format.
-    \item \textbf{Visual Column Mapping}: Use dropdown menus to map your data columns to the required model variables.
-    \item \textbf{Point-and-Click Analysis}: Select your desired model, goal, and all relevant parameters without writing any code.
-    \item \textbf{Interactive Outputs}: Immediately visualize results, including survival curves and the final power curve.
-    \item \textbf{One-Click Reporting}: Generate a comprehensive, publication-ready PDF or HTML report that documents your analysis.
+  \item Upload pilot data in \texttt{.csv} format
+  \item Map columns (time, status, treatment, strata) via dropdown menus
+  \item Select model (\texttt{linear}, \texttt{GAM}, \texttt{additive}, \texttt{MS}, \texttt{DC})
+  \item Choose goal (\texttt{power} or \texttt{ss}) and method (\texttt{analytical} or \texttt{boot})
+  \item Interactive outputs: survival curves, power curves
+  \item Export analysis reports in pdf
 \end{itemize}
+\end{block}
+
 \end{frame}
 
-% Frame 20: Application Screenshot
+% ---------- Frame 23 ----------
 \begin{frame}
 \frametitle{Application Interface}
 \begin{figure}
 \includegraphics[width=\textwidth]{images/app-ss.png}
-\caption{The main analysis panel of the Shiny application, showing the user interface for model selection and result visualization.}
+\caption{Analysis panel of the Shiny application: model selection and result visualization.}
 \end{figure}
 \end{frame}
 
-% Frame 21: Conclusion
+% ---------- Frame 24 ----------
 \begin{frame}
-\frametitle{Conclusion}
-\textbf{`RMSTSS` provides a powerful, flexible, and accessible software suite for designing modern clinical trials.}
+\frametitle{Conclusion \& Future Aims}
+
+\begin{block}{Conclusion}
 \begin{itemize}
-    \item \textbf{Statistically Rigorous}: Implements a wide range of modern, direct-regression RMST models.
-    \item \textbf{Causally Meaningful}: Empowers researchers to design trials based on the highly interpretable RMST endpoint.
-    \item \textbf{Accessible to All}: Caters to both expert statisticians via the R package and a broader research community via the Shiny application.
+  \item \textbf{Statistically Rigorous:} Implements linear, GAM, dependent censoring, and stratified RMST models
+  \item \textbf{Causally Interpretable:} Treatment effect $\beta_A$ (difference) or $\exp(\beta_A)$ (ratio)
+  \item \textbf{Practical:} Available as both an R package and a Shiny web app
 \end{itemize}
+\end{block}
+
+\begin{block}{Future Aims}
+\begin{itemize}
+  \item Extend RMSTSS to handle \textbf{time-varying treatments} and adaptive designs
+  \item Incorporate \textbf{Bayesian approaches} for RMST-based trial planning
+  \item Develop modules for \textbf{multi-arm and platform trials}
+  \item Improve \textbf{Shiny app interactivity} with dynamic simulation dashboards
+\end{itemize}
+\end{block}
 \end{frame}
 
-% Frame 22: Access & Acknowledgments
+% Frame 25: References
+\begin{frame}[allowframebreaks]
+\frametitle{References}
+\scriptsize
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{frame}
+
+% Frame 26: Access & Acknowledgments
 \begin{frame}
 \frametitle{Access \& Acknowledgments}
-\textbf{Access the Software}:
-\begin{itemize}
-    \item \textbf{Live Web App}: \texttt{arnab96.shinyapps.io/uthsc-app/}
-    \item \textbf{R Package on GitHub}: \texttt{github.com/arnab-aich/RMSTSS}
-\end{itemize}
-\vspace{1em}
-\textbf{Acknowledgments} \cite{[1]}:
-\begin{itemize}
-    \item NSF grant no. 2220726.
-    \item UTHSC BERD (Biostatistics, Epidemiology and Research Design).
-\end{itemize}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\scriptsize
+    \textbf{Acknowledgments}
+ \begin{itemize}
+        \item Grateful appreciation to Dr.\ Yuan Zhang (UTHSC) for mentorship
+        \item Special thanks to Dr.\ Gregory Farage and Dr.\ Saunak Sen (UTHSC) for their guidance and support
+        \item Support provided by UTHSC BERD (Biostatistics, Epidemiology, and Research Design)
+        \item Research funded by NSF Grant No.\ 2220726
+    \end{itemize}
 \vfill
 \begin{center}
 \Huge{\textbf{Questions?}}
 \end{center}
+\end{column}
+    \begin{column}{0.5\textwidth}
+    \scriptsize
+        \centering
+        \textbf{Scan for Web App} \\
+        \qrcode[height=3cm]{https://arnab96.shinyapps.io/uthsc-app/}
+        \vspace{2em}
+        \\
+        \textbf{Scan for R Package} \\
+        \qrcode[height=3cm]{https://uthsc-zhang.github.io/RMSTSS-Package/}
+    \end{column}
+\end{columns}
 \end{frame}
 
 \end{document}
