@@ -2,7 +2,6 @@
 .Rproj.user
 .Rproj
 *.drawio
-*.toc
-*.snm
-*.gz
+.Rdata
 *.log
+*.gz
