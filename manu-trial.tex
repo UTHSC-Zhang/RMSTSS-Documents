@@ -1,0 +1,165 @@
+\documentclass[article]{jss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% JSS Special Commands   %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{RMSTSS: A Comprehensive R Package and Web Application for Sample Size and Power Calculation in Clinical Trials Using Restricted Mean Survival Time}
+\Plaintitle{RMSTSS: Sample Size and Power Calculation with Restricted Mean Survival Time}
+\Shorttitle{RMSTSS: Sample Size and Power Calculation}
+
+\author{Arnab Aich\\University of Tennessee Health Science Center \And Yuan Zhang\\University of Tennessee Health Science Center}
+\Plainauthor{Arnab Aich, Yuan Zhang}
+
+\Abstract{
+The design and analysis of time-to-event clinical trials have traditionally been dominated by the hazard ratio (HR), derived from semi-parametric models like the Cox proportional hazards model. However, the validity of the HR is critically dependent on the proportional hazards (PH) assumption, which is frequently violated in practice and can complicate interpretation. The Restricted Mean Survival Time (RMST) has emerged as a robust and clinically intuitive alternative. Despite its growing acceptance, software for RMST-based design remains limited. 
+
+This article introduces \texttt{RMSTSS}, an integrated toolkit consisting of an R package and Shiny web application. The software supports a wide array of RMST-based statistical models, including direct covariate adjustment, stratified designs for multi-center trials, generalized additive models for non-linear effects, and methods for dependent censoring. Both analytical and bootstrap frameworks are implemented, providing flexibility for exploratory and confirmatory trial planning. The Shiny interface further lowers the barrier to entry, making these methods accessible to researchers without advanced programming expertise. Together, these features position \texttt{RMSTSS} as a comprehensive resource for planning robust, efficient, and interpretable clinical trials based on RMST.
+}
+
+\Keywords{Restricted mean survival time, sample size calculation, power analysis, survival analysis, R, Shiny, clinical trials}
+\Plainkeywords{Restricted mean survival time, sample size calculation, power analysis, survival analysis, R, Shiny, clinical trials}
+
+\Address{
+Arnab Aich \\
+Department of Preventive Medicine \\
+University of Tennessee Health Science Center \\
+Memphis, TN, USA \\
+E-mail: \email{aaich@uthsc.edu} \\
+\\
+Yuan Zhang \\
+Department of Preventive Medicine \\
+University of Tennessee Health Science Center \\
+Memphis, TN, USA \\
+E-mail: \email{yzhang@uthsc.edu}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Document               %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{Introduction}
+
+\subsection{The proportional hazards assumption: A common hurdle}
+For decades, time-to-event clinical trials have centered on hazard-based models, most notably the Cox proportional hazards model. The primary estimand, the hazard ratio (HR), quantifies instantaneous relative risk between groups. However, the validity of the HR critically depends on the proportional hazards (PH) assumption, which is often violated in practice \citep{royston2013, uno2014}. Crossing survival curves or delayed treatment effects exemplify such violations. When PH does not hold, the HR is difficult to interpret and may depend on follow-up length, motivating the search for alternatives.
+
+\subsection{Restricted mean survival time: A robust alternative}
+The restricted mean survival time (RMST) is defined as the average event-free time up to a prespecified time $L$, corresponding to the area under the Kaplan–Meier curve up to $L$. RMST is assumption-free, clinically interpretable, and increasingly recommended as a primary endpoint \citep{royston2013, uno2014}. For example, a difference in RMST can be expressed as “patients on the new treatment lived on average three months longer without disease progression over five years.”
+
+\subsection{Software gap and contribution of \texttt{RMSTSS}}
+Despite methodological advances, RMST-based power and sample size tools remain limited. \texttt{RMSTSS} was developed to address this gap by providing an R package and Shiny application for RMST-based design, with broad model coverage and both analytical and bootstrap methods.
+
+\section{Statistical background and implemented models}
+
+Table~\ref{tab:model_overview} summarizes the implemented models.
+
+\begin{table}[h!]
+\centering
+\caption{Overview of statistical models in \texttt{RMSTSS}}
+\label{tab:model_overview}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Model Family & Key Application & Calculation Methods & References \\ \midrule
+Linear IPCW & Covariate adjustment & Analytical, Bootstrap & \citet{tian2014} \\
+Additive Stratified & Multi-center (additive) & Analytical, Bootstrap & \citet{zhang2024} \\
+Multiplicative Stratified & Multi-center (multiplicative) & Analytical, Bootstrap & \citet{wang2019} \\
+Semiparametric GAM & Non-linear covariates & Bootstrap & Wood (2006) \\
+Dependent Censoring & Competing risks & Analytical & \citet{wang2018} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analytical vs bootstrap frameworks}
+The analytical framework exploits asymptotic normality of the RMST estimator for rapid calculations, while bootstrap simulation resamples pilot data to empirically approximate power. Both are provided to support exploratory and confirmatory designs.
+
+\subsection{Linear IPCW model}
+Based on \citet{tian2014}, RMST is modeled as a linear function of treatment and covariates, fitted with inverse probability of censoring weights. 
+
+\subsection{Stratified models}
+\citet{zhang2024} proposed an additive model where strata have distinct baselines but shared covariate effects. \citet{wang2019} proposed a multiplicative form, modeling log-RMST linearly.
+
+\subsection{Generalized additive models}
+Non-linear covariate effects are handled via GAMs using IPCW pseudo-observations. Power estimation relies on bootstrap due to variance intractability.
+
+\subsection{Dependent censoring}
+Competing risks are addressed with weighted linear regression using weights derived from cause-specific hazards \citep{wang2018}.
+
+\section{The \texttt{RMSTSS} software}
+
+\subsection{Implementation in R}
+The R package provides functions following the convention \texttt{model.metric.method()}, e.g., \texttt{linear.power.analytical()}, \texttt{additive.ss.boot()}. Functions support both power and sample size estimation, with analytical and bootstrap variants where available. The GUI can be launched via \texttt{RMSTSS::run\_app()}.
+
+\subsection{Shiny application}
+The Shiny web app provides an accessible interface, guiding users through data upload, column mapping, model specification, execution, visualization, and report download.
+
+\section{Illustrations}
+
+\subsection{Example 1: Covariate adjustment (Veteran's lung cancer)}
+\begin{Code}
+R> power_results_vet <- linear.power.analytical(
++   pilot_data = vet,
++   time_var = "time",
++   status_var = "status",
++   arm_var = "arm",
++   linear_terms = "karno",
++   sample_sizes = c(100, 150, 200, 250),
++   L = 270
++ )
+\end{Code}
+
+\subsection{Example 2: Stratified analysis (Colon cancer trial)}
+\begin{Code}
+R> ss_results_colon <- additive.ss.analytical(
++   pilot_data = colon_death,
++   time_var = "time", status_var = "status",
++   arm_var = "arm", strata_var = "strata",
++   target_power = 0.60, L = 1825,
++   n_start = 100, n_step = 100,
++   max_n_per_arm = 10000
++ )
+\end{Code}
+
+\begin{Code}
+R> power_ms_boot <- MS.power.boot(
++   pilot_data = colon_death,
++   time_var = "time", status_var = "status",
++   arm_var = "arm", strata_var = "strata",
++   sample_sizes = c(100, 300, 500),
++   L = 1825, n_sim = 100,
++   parallel.cores = 10
++ )
+\end{Code}
+
+\subsection{Example 3: Non-linear effects (Breast cancer)}
+\begin{Code}
+R> power_gam <- GAM.power.boot(
++   pilot_data = gbsg_prepared,
++   time_var = "rfstime", status_var = "status",
++   arm_var = "arm", smooth_terms = "pgr",
++   sample_sizes = c(50, 200, 400),
++   L = 2825, n_sim = 500,
++   parallel.cores = 10
++ )
+\end{Code}
+
+\subsection{Example 4: Dependent censoring (Monoclonal gammopathy)}
+\begin{Code}
+R> dc_power_results <- DC.power.analytical(
++   pilot_data = mgus_prepared,
++   time_var = "time", status_var = "event_primary",
++   arm_var = "arm",
++   dep_cens_status_var = "event_dependent",
++   sample_sizes = c(100, 250, 500),
++   linear_terms = "age", L = 120
++ )
+\end{Code}
+
+\section{Summary}
+\texttt{RMSTSS} consolidates RMST-based methods into an accessible R package and Shiny app. Its breadth of implemented models and dual analytical/bootstrapped workflows equip researchers to design trials beyond the proportional hazards framework. Future development will extend bootstrap support to dependent censoring and add diagnostic tools.
+
+\bibliographystyle{jss}
+\bibliography{references}
+
+\end{document}
