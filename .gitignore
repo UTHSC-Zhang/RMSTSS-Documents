@@ -1,3 +1,8 @@
 .Rhistory
 .Rproj.user
 .Rproj
+*.drawio
+.Rdata
+*.log
+*.gz
+Presentation_Script.pdf
