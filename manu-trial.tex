@@ -47,16 +47,16 @@
 % JSS FRONT MATTER (replaces \title, \author, \date/\maketitle)
 % ============================================================
 
-\title{\pkg{RMSTSS}: A Comprehensive R Package and Web Application for Sample Size and Power Calculation in Clinical Trials Using Restricted Mean Survival Time}
-\Plaintitle{RMSTSS: Sample Size and Power Calculation with Restricted Mean Survival Time}
-\Shorttitle{RMSTSS: Sample Size and Power Calculation}
+\title{\pkg{RMSTpowerBoost}: A Comprehensive R Package and Web Application for Sample Size and Power Calculation in Clinical Trials Using Restricted Mean Survival Time}
+\Plaintitle{RMSTpowerBoost: Sample Size and Power Calculation with Restricted Mean Survival Time}
+\Shorttitle{RMSTpowerBoost: Sample Size and Power Calculation}
 
 \author{Arnab Aich\\University of Tennessee Health Science Center
   \And Yuan Zhang\\University of Tennessee Health Science Center}
 \Plainauthor{Arnab Aich, Yuan Zhang}
 
 \Abstract{
-The design and analysis of time-to-event clinical trials have traditionally been dominated by the hazard ratio (HR), derived from semi-parametric models like the Cox proportional hazards model. However, the validity of the HR is critically dependent on the proportional hazards (PH) assumption, which is frequently violated in practice and can complicate the interpretation of treatment effects. The Restricted Mean Survival Time (RMST) has emerged as a robust and clinically intuitive alternative, quantifying the average event-free survival time up to a specified time point without relying on the PH assumption. Despite its growing acceptance, a significant gap exists in the availability of comprehensive and accessible software for designing clinical trials based on RMST. This paper introduces \texttt{RMSTSS}, an integrated software toolkit developed to fill this void. \texttt{RMSTSS} consists of a versatile R package and an interactive Shiny web application, providing a unified platform for power and sample size calculations using a wide array of modern RMST-based statistical models. The software implements methods for direct covariate adjustment, analysis of stratified data from multi-center trials, modeling of non-linear covariate effects using Generalized Additive Models (GAMs), and adjustment for dependent censoring (competing risks). By offering both fast analytical and robust bootstrap-based computational methods, \texttt{RMSTSS} caters to diverse user needs, from rapid initial exploration to rigorous final validation. The accompanying web application provides a point-and-click interface, making these advanced statistical methods accessible to researchers without extensive programming expertise. \texttt{RMSTSS} facilitates the adoption of RMST as a primary endpoint, thereby contributing to the planning of more robust, efficient, and interpretable clinical trials.
+The design and analysis of time-to-event clinical trials have traditionally been dominated by the hazard ratio (HR), derived from semi-parametric models like the Cox proportional hazards model. However, the validity of the HR is critically dependent on the proportional hazards (PH) assumption, which is frequently violated in practice and can complicate the interpretation of treatment effects. The Restricted Mean Survival Time (RMST) has emerged as a robust and clinically intuitive alternative, quantifying the average event-free survival time up to a specified time point without relying on the PH assumption. Despite its growing acceptance, a significant gap exists in the availability of comprehensive and accessible software for designing clinical trials based on RMST. This paper introduces \texttt{RMSTpowerBoost}, an integrated software toolkit developed to fill this void. \texttt{RMSTpowerBoost} consists of a versatile R package and an interactive Shiny web application, providing a unified platform for power and sample size calculations using a wide array of modern RMST-based statistical models. The software implements methods for direct covariate adjustment, analysis of stratified data from multi-center trials, modeling of non-linear covariate effects using Generalized Additive Models (GAMs), and adjustment for dependent censoring (competing risks). By offering both fast analytical and robust bootstrap-based computational methods, \texttt{RMSTpowerBoost} caters to diverse user needs, from rapid initial exploration to rigorous final validation. The accompanying web application provides a point-and-click interface, making these advanced statistical methods accessible to researchers without extensive programming expertise. \texttt{RMSTpowerBoost} facilitates the adoption of RMST as a primary endpoint, thereby contributing to the planning of more robust, efficient, and interpretable clinical trials.
 }
 
 \Keywords{Restricted mean survival time, sample size, power, survival analysis, R, Shiny, clinical trials}
@@ -94,17 +94,17 @@ In response to the limitations of the HR, the Restricted Mean Survival Time (RMS
 
 The RMST offers several distinct advantages over the HR. First and foremost, it is a non-parametric measure that does not rely on the proportional hazards assumption or any other restrictive modeling assumptions, making it valid in a much wider range of clinical scenarios \cite{[1]}. Second, its interpretation is direct and highly intuitive for both clinicians and patients. A difference in RMST between two groups can be stated in simple terms, such as "patients on the new treatment lived, on average, three months longer without disease progression over a five-year period" \cite{[1]}. This provides a clear and unambiguous measure of the absolute treatment benefit, which is often more clinically relevant than the relative effect conveyed by the HR \cite{[1]}.
 
-\subsection{The Software Gap and the Contribution of RMSTSS}
-Despite the clear methodological advantages and growing popularity of RMST, its adoption in the critical phase of clinical trial design has been hampered by a lack of accessible and comprehensive software tools. While methods for RMST-based analysis are established, tools for a priori power and sample size calculations—essential for planning efficient and ethical trials—are scarce and often limited in scope.
+\subsection{The Software Gap and the Contribution of RMSTpowerBoost}
+Despite the clear methodological advantages and growing popularity of RMST, its adoption in the critical phase of clinical trial design has been hampered by a lack of accessible and comprehensive software tools. While methods for RMST-based analysis are established, tools for a priori power and sample size calculationsâ€”essential for planning efficient and ethical trialsâ€”are scarce and often limited in scope.
 
-The \texttt{RMSTSS} software project was initiated to "fill this gap" by providing a powerful, flexible, and user-friendly toolkit for RMST-based trial design \cite{[1]}. This paper introduces \texttt{RMSTSS}, which is delivered as an integrated suite comprising a comprehensive R package for programmatic analysis and an interactive Shiny web application for users who prefer a graphical interface. The software implements a wide range of modern statistical methods, allowing researchers to design trials that account for complex features such as covariate adjustment, multi-center stratification, non-linear effects, and competing risks. This paper details the statistical foundations of the models implemented in \texttt{RMSTSS}, describes the architecture and features of the software, and demonstrates its practical application through a series of illustrative examples.
+The \texttt{RMSTpowerBoost} software project was initiated to "fill this gap" by providing a powerful, flexible, and user-friendly toolkit for RMST-based trial design \cite{[1]}. This paper introduces \texttt{RMSTpowerBoost}, which is delivered as an integrated suite comprising a comprehensive R package for programmatic analysis and an interactive Shiny web application for users who prefer a graphical interface. The software implements a wide range of modern statistical methods, allowing researchers to design trials that account for complex features such as covariate adjustment, multi-center stratification, non-linear effects, and competing risks. This paper details the statistical foundations of the models implemented in \texttt{RMSTpowerBoost}, describes the architecture and features of the software, and demonstrates its practical application through a series of illustrative examples.
 
 \section{Statistical Background and Implemented Models}
-The \texttt{RMSTSS} package provides a suite of functions built upon a robust statistical foundation to address various complexities encountered in clinical trial design. The models range from foundational linear models to advanced methods for stratified and non-linear data structures. Table \ref{tab:model_overview} provides a high-level summary of the statistical models available within the software.
+The \texttt{RMSTpowerBoost} package provides a suite of functions built upon a robust statistical foundation to address various complexities encountered in clinical trial design. The models range from foundational linear models to advanced methods for stratified and non-linear data structures. Table \ref{tab:model_overview} provides a high-level summary of the statistical models available within the software.
 
 \begin{table}[h!]
 \centering
-\caption{Overview of Statistical Models in RMSTSS}
+\caption{Overview of Statistical Models in RMSTpowerBoost}
 \label{tab:model_overview}
 \begin{tabular}{@{}llll@{}}
 \toprule
@@ -118,7 +118,7 @@ Dependent Censoring & Adjusting for competing risks & Analytical only & \citet{w
 \end{table}
 
 \subsection{Core Power Calculation Frameworks}
-A central design principle of the \texttt{RMSTSS} package is to provide users with a choice between two distinct computational frameworks for power and sample size estimation. This dual-method offering reflects a deep understanding of the practical workflow of trial design, which often involves an iterative process of exploration and validation.
+A central design principle of the \texttt{RMSTpowerBoost} package is to provide users with a choice between two distinct computational frameworks for power and sample size estimation. This dual-method offering reflects a deep understanding of the practical workflow of trial design, which often involves an iterative process of exploration and validation.
 
 \subsubsection{The Analytical Method}
 The analytical method provides a rapid, formula-based approach for power calculation. It is based on the asymptotic normality of the test statistic for the treatment effect. For a given total sample size $N$, the power is calculated as:
@@ -137,14 +137,14 @@ where $n_{\text{sim}}$ is the total number of simulations and $\alpha$ is the pr
 The provision of both analytical and bootstrap functions empowers users with a flexible workflow. They can use the fast \texttt{.analytical} functions for rapid scenario testing and then employ the more rigorous \texttt{.boot} functions for final validation of their design parameters.
 
 \subsection{Linear Models with Inverse Probability of Censoring Weighting (IPCW)}
-The foundational model for covariate adjustment in \texttt{RMSTSS} is the linear model with IPCW, based on the methodology of \citet{tian2014}. This approach models the conditional RMST as a linear function of the treatment and other covariates. The model is specified as:
+The foundational model for covariate adjustment in \texttt{RMSTpowerBoost} is the linear model with IPCW, based on the methodology of \citet{tian2014}. This approach models the conditional RMST as a linear function of the treatment and other covariates. The model is specified as:
 \begin{equation}
 \mathbb{E} = \beta_0 + \beta_1 \text{Treatment}_i + \beta_2 \text{Covariate}_{i}
 \end{equation}
 Here, the expected RMST up to time $L$ for subject $i$ is modeled as a linear combination of their treatment assignment and a set of covariates $Z_i$ \cite{[1]}. To account for right-censoring, the model is fitted using IPCW, where each observation is weighted by the inverse of the probability of remaining uncensored up to their observed time.
 
 \subsection{Stratified Models for Multi-Center Trials}
-Clinical trials are often conducted across multiple centers, which introduces heterogeneity that must be accounted for in the design and analysis. \texttt{RMSTSS} implements two powerful semiparametric models for stratified data.
+Clinical trials are often conducted across multiple centers, which introduces heterogeneity that must be accounted for in the design and analysis. \texttt{RMSTpowerBoost} implements two powerful semiparametric models for stratified data.
 
 \subsubsection{Additive Model}
 The semiparametric additive model, developed by \citet{zhang2024}, assumes that the effect of covariates is additive and constant across strata, while allowing each stratum to have a unique baseline RMST. The model is defined as:
@@ -161,33 +161,33 @@ As an alternative, the multiplicative model, based on the work of \citet{wang201
 This structure is equivalent to a linear model on the logarithm of the RMST and offers a different way to model the interaction between covariates and stratum effects \cite{[1]}.
 
 \subsection{Semiparametric Generalized Additive Models (GAMs) for Non-Linear Effects}
-In many clinical contexts, the relationship between a continuous covariate (e.g., a biomarker level) and the outcome is not linear. To accommodate such scenarios, \texttt{RMSTSS} incorporates a bootstrap-based power calculation method using Generalized Additive Models (GAMs). A GAM extends the linear model by allowing non-linear functions of covariates to be estimated from the data. The model has the form:
+In many clinical contexts, the relationship between a continuous covariate (e.g., a biomarker level) and the outcome is not linear. To accommodate such scenarios, \texttt{RMSTpowerBoost} incorporates a bootstrap-based power calculation method using Generalized Additive Models (GAMs). A GAM extends the linear model by allowing non-linear functions of covariates to be estimated from the data. The model has the form:
 \begin{equation}
 \mathbb{E}[\text{pseudo}_i] = \beta_0 + \beta_1 \cdot \text{Treatment}_i + \sum_{k=1}^{q} f_k(\text{Covariate}_{ik})
 \end{equation}
 where the model is fitted on IPCW-based pseudo-observations, and the $f_k()$ are flexible, non-linear smooth functions (e.g., splines) that capture the relationship between the covariates and the RMST \cite{[1]}.
 
-The statistical complexity of GAMs, particularly the challenge of deriving a closed-form analytical expression for the variance of the treatment effect in the presence of multiple non-parametrically estimated smooth functions, makes an analytical power calculation intractable. The bootstrap method circumvents this difficulty by empirically simulating the entire data generation and model-fitting process. Consequently, \texttt{RMSTSS} provides only bootstrap-based functions (\texttt{GAM.power.boot} and \texttt{GAM.ss.boot}) for this model class, a design choice dictated by the underlying statistical theory to ensure robust and reliable power estimation.
+The statistical complexity of GAMs, particularly the challenge of deriving a closed-form analytical expression for the variance of the treatment effect in the presence of multiple non-parametrically estimated smooth functions, makes an analytical power calculation intractable. The bootstrap method circumvents this difficulty by empirically simulating the entire data generation and model-fitting process. Consequently, \texttt{RMSTpowerBoost} provides only bootstrap-based functions (\texttt{GAM.power.boot} and \texttt{GAM.ss.boot}) for this model class, a design choice dictated by the underlying statistical theory to ensure robust and reliable power estimation.
 
 \subsection{Adjusting for Dependent Censoring}
 Standard survival analysis methods assume that censoring is independent of the event of interest. However, in studies with competing risks, this assumption is violated. For example, in a cancer trial where the primary endpoint is cancer-related death, death from other causes (e.g., cardiovascular disease) is a competing event that constitutes dependent censoring.
 
-To address this, \texttt{RMSTSS} implements the method proposed by \citet{wang2018} for handling covariate-dependent censoring. This approach involves modeling the cause-specific hazards for each of the $K$ competing censoring events. The final weight for each subject is then calculated as a product of weights derived from these models:
+To address this, \texttt{RMSTpowerBoost} implements the method proposed by \citet{wang2018} for handling covariate-dependent censoring. This approach involves modeling the cause-specific hazards for each of the $K$ competing censoring events. The final weight for each subject is then calculated as a product of weights derived from these models:
 \begin{equation}
 W_i = \exp\left(\sum_{k=1}^{K} \hat{\Lambda}_{k}(Y_i)\right)
 \end{equation}
 where $\hat{\Lambda}_{k}$ is the estimated cumulative hazard for censoring cause $k$, and $Y_i = \min(T_i, L)$ is the truncated event time \cite{[1]}. The final analysis is a weighted linear regression on the RMST. Power calculations use this weighting scheme and employ a robust sandwich estimator for the variance to properly account for the multiple weighting components.
 
-\section{The RMSTSS Software: An Integrated Toolkit}
-\texttt{RMSTSS} is designed as a dual-interface toolkit to cater to the needs of a diverse user base, from computational statisticians requiring programmatic control to applied researchers who benefit from a graphical user interface.
+\section{The RMSTpowerBoost Software: An Integrated Toolkit}
+\texttt{RMSTpowerBoost} is designed as a dual-interface toolkit to cater to the needs of a diverse user base, from computational statisticians requiring programmatic control to applied researchers who benefit from a graphical user interface.
 
-\subsection{The \texttt{RMSTSS} R Package: A Tool for Programmatic Analysis}
-For statisticians, bioinformaticians, and other researchers comfortable with the R programming language, the \texttt{RMSTSS} package provides a comprehensive and powerful command-line interface \cite{[1]}. The package is designed with a focus on consistency and ease of use. Functions follow a predictable naming convention: \texttt{model.metric.method()}, such as \texttt{linear.power.analytical()} or \texttt{additive.ss.boot()}. This structure makes the package's functionality transparent and easy to navigate.
+\subsection{The \texttt{RMSTpowerBoost} R Package: A Tool for Programmatic Analysis}
+For statisticians, bioinformaticians, and other researchers comfortable with the R programming language, the \texttt{RMSTpowerBoost} package provides a comprehensive and powerful command-line interface \cite{[1]}. The package is designed with a focus on consistency and ease of use. Functions follow a predictable naming convention: \texttt{model.metric.method()}, such as \texttt{linear.power.analytical()} or \texttt{additive.ss.boot()}. This structure makes the package's functionality transparent and easy to navigate.
 
-The package contains a complete suite of functions for both power and sample size calculations for all the statistical models described in Section 2 \cite{[1]}. It can be installed directly from GitHub. For users who wish to run the graphical interface on their local machine, the package includes a simple command: \texttt{RMSTSS::run\_app()} \cite{[1, 1]}.
+The package contains a complete suite of functions for both power and sample size calculations for all the statistical models described in Section 2 \cite{[1]}. It can be installed directly from GitHub. For users who wish to run the graphical interface on their local machine, the package includes a simple command: \texttt{RMSTpowerBoost::run\_app()} \cite{[1, 1]}.
 
 \subsection{The Shiny Web Application: A Gateway to Advanced Methods}
-Recognizing that not all researchers are expert programmers, \texttt{RMSTSS} includes an interactive Shiny web application that provides a point-and-click interface to the full functionality of the package \cite{[1]}. This application serves as a powerful tool for knowledge translation, effectively bridging the gap between cutting-edge statistical methodologies and the applied researchers who design clinical trials. By removing the barrier of coding, the application democratizes access to these advanced methods, empowering a wider audience to design more statistically sound and efficient studies.
+Recognizing that not all researchers are expert programmers, \texttt{RMSTpowerBoost} includes an interactive Shiny web application that provides a point-and-click interface to the full functionality of the package \cite{[1]}. This application serves as a powerful tool for knowledge translation, effectively bridging the gap between cutting-edge statistical methodologies and the applied researchers who design clinical trials. By removing the barrier of coding, the application democratizes access to these advanced methods, empowering a wider audience to design more statistically sound and efficient studies.
 
 The application, which can be accessed via a live web server, guides the user through a logical workflow \cite{[1]}:
 \begin{enumerate}
@@ -204,7 +204,7 @@ The application, which can be accessed via a live web server, guides the user th
         \centering
         % Placeholder kept intentionally (content unchanged)
         \framebox[0.9\linewidth][c]{\rule{0pt}{4cm} \texttt{images/app-ss.png}}
-        \caption{Screenshot of the \texttt{RMSTSS} Shiny application interface, showing the main analysis panel and result visualization.}
+        \caption{Screenshot of the \texttt{RMSTpowerBoost} Shiny application interface, showing the main analysis panel and result visualization.}
         \label{fig:app-ss}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
@@ -217,7 +217,7 @@ The application, which can be accessed via a live web server, guides the user th
 \end{figure}
 
 \section{Illustrative Applications}
-To demonstrate the practical utility and versatility of the \texttt{RMSTSS} package, this section presents a series of analyses using publicly available datasets included with the package. Each example highlights a different statistical model and analytical goal.
+To demonstrate the practical utility and versatility of the \texttt{RMSTpowerBoost} package, this section presents a series of analyses using publicly available datasets included with the package. Each example highlights a different statistical model and analytical goal.
 
 \subsection{Example 1: Covariate Adjustment in a Veteran's Lung Cancer Trial}
 This example uses the \texttt{veteran} dataset from the \texttt{survival} package to demonstrate a standard power calculation with covariate adjustment. The goal is to calculate the power to detect a treatment effect on survival time, adjusting for the Karnofsky performance score (\texttt{karno}). The \texttt{linear.power.analytical} function is used.
@@ -324,13 +324,13 @@ mgus\_prepared & Dependent Censoring & Power Calc. & L=120, Dep. Cens.='event\_d
 \section{Discussion}
 
 \subsection{Summary of Contributions}
-\texttt{RMSTSS} provides a powerful and flexible software toolkit for designing clinical trials using the Restricted Mean Survival Time \cite{[1]}. Its primary contribution is the consolidation of a comprehensive suite of modern statistical methods for RMST-based power and sample size calculation into a single, cohesive platform. Key features include the implementation of models for covariate adjustment, multi-center stratification, non-linear effects, and competing risks. The provision of a dual interface—a programmatic R package for expert users and an intuitive Shiny web application for a broader audience—ensures that these advanced methods are accessible to all researchers involved in trial design. Furthermore, the choice between rapid analytical methods and robust bootstrap simulations offers a flexible workflow tailored to the iterative nature of planning clinical studies.
+\texttt{RMSTpowerBoost} provides a powerful and flexible software toolkit for designing clinical trials using the Restricted Mean Survival Time \cite{[1]}. Its primary contribution is the consolidation of a comprehensive suite of modern statistical methods for RMST-based power and sample size calculation into a single, cohesive platform. Key features include the implementation of models for covariate adjustment, multi-center stratification, non-linear effects, and competing risks. The provision of a dual interfaceâ€”a programmatic R package for expert users and an intuitive Shiny web application for a broader audienceâ€”ensures that these advanced methods are accessible to all researchers involved in trial design. Furthermore, the choice between rapid analytical methods and robust bootstrap simulations offers a flexible workflow tailored to the iterative nature of planning clinical studies.
 
 \subsection{Strengths, Limitations, and Recommendations}
-The main strength of \texttt{RMSTSS} lies in its breadth of state-of-the-art statistical methods, allowing users to design trials that more accurately reflect the complexities of clinical data \cite{[1]}. By providing a point-and-click interface via the Shiny app, the software significantly lowers the barrier to entry for using these sophisticated techniques, thereby democratizing access to best-practice methodologies. This has the potential to improve the quality and efficiency of clinical trials by encouraging the move away from methods reliant on the often-violated proportional hazards assumption.
+The main strength of \texttt{RMSTpowerBoost} lies in its breadth of state-of-the-art statistical methods, allowing users to design trials that more accurately reflect the complexities of clinical data \cite{[1]}. By providing a point-and-click interface via the Shiny app, the software significantly lowers the barrier to entry for using these sophisticated techniques, thereby democratizing access to best-practice methodologies. This has the potential to improve the quality and efficiency of clinical trials by encouraging the move away from methods reliant on the often-violated proportional hazards assumption.
 
-The primary limitation of any power calculation tool, including \texttt{RMSTSS}, is its reliance on representative pilot data \cite{[1]}. The accuracy of the estimated power or required sample size is fundamentally contingent on the effect sizes, variance structures, and covariate relationships estimated from the available pilot dataset. If the pilot data is not representative of the planned trial population, the calculations may be misleading. Researchers should conduct sensitivity analyses to assess the impact of uncertainty in these pilot estimates. A further practical constraint is the computational intensity of the bootstrap-based methods, which can be time-consuming and may require access to parallel computing resources for timely results, a feature supported by the package \cite{[1]}.
+The primary limitation of any power calculation tool, including \texttt{RMSTpowerBoost}, is its reliance on representative pilot data \cite{[1]}. The accuracy of the estimated power or required sample size is fundamentally contingent on the effect sizes, variance structures, and covariate relationships estimated from the available pilot dataset. If the pilot data is not representative of the planned trial population, the calculations may be misleading. Researchers should conduct sensitivity analyses to assess the impact of uncertainty in these pilot estimates. A further practical constraint is the computational intensity of the bootstrap-based methods, which can be time-consuming and may require access to parallel computing resources for timely results, a feature supported by the package \cite{[1]}.
 
 \subsection{Future Directions}
-Future development of \texttt{RMSTSS} is planned to enhance its capabilities further. A key priority is to extend the robust bootstrap approach to the dependent censoring models, which currently only offer an analytical solution \cite{[1]}. This would
+Future development of \texttt{RMSTpowerBoost} is planned to enhance its capabilities further. A key priority is to extend the robust bootstrap approach to the dependent censoring models, which currently only offer an analytical solution \cite{[1]}. This would
 \end{document}

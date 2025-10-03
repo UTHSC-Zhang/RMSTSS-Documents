@@ -11,7 +11,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath, amssymb}
 \usepackage{booktabs}
-\usepackage[authoryear,round]{natbib} % author–year citations
+\usepackage[authoryear,round]{natbib} % authorâ€“year citations
 \usepackage{qrcode}
 \usepackage{listings}
 \lstset{
@@ -27,8 +27,8 @@
 % ===== Presenter notes toggle (Overleaf-friendly) =====
 \usepackage{pgfpages}
 \newif\ifpresenter
-\presentertrue    % <— uncomment for PRESENTER PDF (two-panel pages)
-% \presenterfalse     % <— audience PDF (slides only)
+\presentertrue    % <â€” uncomment for PRESENTER PDF (two-panel pages)
+% \presenterfalse     % <â€” audience PDF (slides only)
 
 \ifpresenter
   \setbeameroption{show notes on second screen=right}
@@ -40,7 +40,7 @@
 % ======================================================
 
 % Title Page Information
-\title[RMSTSS]{RMSTSS: A Comprehensive Software Suite for Power and Sample Size Calculation in Modern Clinical Trials}
+\title[RMSTpowerBoost]{RMSTpowerBoost: A Comprehensive Software Suite for Power and Sample Size Calculation in Modern Clinical Trials}
 \author{Arnab Aich}
 \institute{Florida State University}
 \date{\today}
@@ -51,9 +51,9 @@
 \begin{frame}
   \titlepage
   \note{
-  \textbf{Opening (10s).} Hi everyone, thanks for being here. I’m Arnab Aich from Florida State University. Today I’ll walk you through \textbf{RMSTSS}, a practical toolkit for planning survival trials when proportional hazards may not hold. \\
-  \textbf{Agenda (10s).} We’ll start with motivation, then the RMST idea and causal interpretation, followed by models, power/sample size methods, two examples, and a quick tour of the web app. \\
-  \textbf{Transition (2s).} Let’s begin with the \emph{why}.
+  \textbf{Opening (10s).} Hi everyone, thanks for being here. Iâ€™m Arnab Aich from Florida State University. Today Iâ€™ll walk you through \textbf{RMSTpowerBoost}, a practical toolkit for planning survival trials when proportional hazards may not hold. \\
+  \textbf{Agenda (10s).} Weâ€™ll start with motivation, then the RMST idea and causal interpretation, followed by models, power/sample size methods, two examples, and a quick tour of the web app. \\
+  \textbf{Transition (2s).} Letâ€™s begin with the \emph{why}.
   }
 \end{frame}
 
@@ -73,15 +73,15 @@
 \begin{block}{Why This Matters}
 \begin{itemize}
   \item \textbf{Ethics:} Avoid underpowered or unnecessary studies.
-  \item \textbf{Efficiency:} Trials are costly—careful design saves time and resources.
+  \item \textbf{Efficiency:} Trials are costlyâ€”careful design saves time and resources.
   \item \textbf{Science:} Adequate power is essential for trustworthy conclusions.
 \end{itemize}
 \end{block}
 
 \note{
-\textbf{Set-up (20s).} Trial planning always starts with two decisions: sample size and power. These are not just technicalities—underpowered studies can waste participant effort and money, and overpowered studies can be unnecessarily large. \\
+\textbf{Set-up (20s).} Trial planning always starts with two decisions: sample size and power. These are not just technicalitiesâ€”underpowered studies can waste participant effort and money, and overpowered studies can be unnecessarily large. \\
 \textbf{Pause (2s).} Emphasize ethical and scientific responsibility. \\
-\textbf{Transition (2s).} With that context, let’s review the standard survival setup.
+\textbf{Transition (2s).} With that context, letâ€™s review the standard survival setup.
 }
 \end{frame}
 
@@ -103,8 +103,8 @@ In many trials, the outcome is the \textbf{time until an event} occurs (e.g., re
 
 \note{
 \textbf{Scaffolding (20s).} We observe $Y=\min(T,C)$ with indicator $\delta$. Survival $S(t)$ and hazard $h(t)$ summarize event-time behavior. \\
-\textbf{Pause (1s).} This is standard—but it sets us up for a common problem with the next slide. \\
-\textbf{Transition (1s).} Let’s talk hazards and proportionality.
+\textbf{Pause (1s).} This is standardâ€”but it sets us up for a common problem with the next slide. \\
+\textbf{Transition (1s).} Letâ€™s talk hazards and proportionality.
 }
 \end{frame}
 
@@ -142,9 +142,9 @@ In many trials, the outcome is the \textbf{time until an event} occurs (e.g., re
 \end{columns}
 
 \note{
-\textbf{Key point (25s).} PH says hazards differ by a constant factor. It’s elegant, but in modern trials we often see delayed treatment effects, diminishing effects, or crossing curves—so the hazard ratio becomes a time-averaged number with murky interpretation. \\
+\textbf{Key point (25s).} PH says hazards differ by a constant factor. Itâ€™s elegant, but in modern trials we often see delayed treatment effects, diminishing effects, or crossing curvesâ€”so the hazard ratio becomes a time-averaged number with murky interpretation. \\
 \textbf{Pause (2s).} We need something interpretable when PH fails. \\
-\textbf{Transition (1s).} That’s where RMST helps.
+\textbf{Transition (1s).} Thatâ€™s where RMST helps.
 }
 \end{frame}
 
@@ -165,7 +165,7 @@ $$\mu(L) = E[\min(T, L)] = \int_0^L S(t) dt$$
 \end{block}
 
 \note{
-\textbf{Essence (20s).} RMST tells us “how much event-free time, on average, up to time $L$.” It’s robust to non-proportional hazards and communicates in time units—intuitive for clinicians and patients. \\
+\textbf{Essence (20s).} RMST tells us â€œhow much event-free time, on average, up to time $L$.â€ Itâ€™s robust to non-proportional hazards and communicates in time unitsâ€”intuitive for clinicians and patients. \\
 \textbf{Transition (2s).} Next, the causal estimand we target.
 }
 \end{frame}
@@ -180,7 +180,7 @@ $$\mu(L) = E[\min(T, L)] = \int_0^L S(t) dt$$
 
 \begin{itemize}
   \item $\Delta(L)$ quantifies the \textbf{average gain in event-free time} from treatment over $[0,L]$.  
-  \item Interpreted directly in \textbf{time units} (e.g., “3 extra months without progression”).  
+  \item Interpreted directly in \textbf{time units} (e.g., â€œ3 extra months without progressionâ€).  
   \item The treatment effect is the \textbf{difference in area under the survival curves} up to $L$.  
 \end{itemize}
 \end{block}
@@ -198,8 +198,8 @@ $$\mu(L) = E[\min(T, L)] = \int_0^L S(t) dt$$
 \end{columns}
 
 \note{
-\textbf{Takeaway (20s).} Our treatment effect is the RMST difference: the average extra event-free time up to $L$. Visually, it’s the difference in the \emph{areas} under the survival curves. This remains valid whether PH holds or not. \\
-\textbf{Pause (2s).} With the estimand set, let’s talk models and software.
+\textbf{Takeaway (20s).} Our treatment effect is the RMST difference: the average extra event-free time up to $L$. Visually, itâ€™s the difference in the \emph{areas} under the survival curves. This remains valid whether PH holds or not. \\
+\textbf{Pause (2s).} With the estimand set, letâ€™s talk models and software.
 }
 \end{frame}
 
@@ -211,8 +211,8 @@ $$\mu(L) = E[\min(T, L)] = \int_0^L S(t) dt$$
 \scriptsize
 \begin{itemize}
   \item Unified framework for \textbf{RMST-based power and sample size} calculations.
-  \item \textbf{RMSTSS R package}: open-source, reproducible implementation.
-  \item \textbf{RMSTSS Shiny web app}: user-friendly interface, no coding required.
+  \item \textbf{RMSTpowerBoost R package}: open-source, reproducible implementation.
+  \item \textbf{RMSTpowerBoost Shiny web app}: user-friendly interface, no coding required.
 \end{itemize}
 \end{block}
 \textit{The following models are currently available.}
@@ -264,7 +264,7 @@ E[\min(T_i,L) \mid A_i, Z_i] = \beta_0 + \beta_A A_i + \beta_Z^\top Z_i
 
 \begin{block}{Censoring Distribution}
 Let $G(t) = P(C_i > t)$ be the survival function of censoring time.  
-We estimate $\widehat{G}(t)$ using Kaplan–Meier.
+We estimate $\widehat{G}(t)$ using Kaplanâ€“Meier.
 \end{block}
 
 \begin{block}{Weights}
@@ -320,7 +320,7 @@ where $f_k(\cdot)$ are spline-based smooth functions.
 \end{itemize}
 \end{block}
 \note{
-\textbf{GAM route (20s).} Pseudo-observations yield “uncensored-like” outcomes, so we can use a GAM for flexibility. We retain $\beta_A$ as the RMST difference while letting covariate effects be nonlinear. \\
+\textbf{GAM route (20s).} Pseudo-observations yield â€œuncensored-likeâ€ outcomes, so we can use a GAM for flexibility. We retain $\beta_A$ as the RMST difference while letting covariate effects be nonlinear. \\
 \textbf{Transition (2s).} Next, stratified models.
 }
 \end{frame}
@@ -346,8 +346,8 @@ Interpretation: $\exp(\beta_A)$ is the RMST ratio (treatment vs. control), commo
 \end{block}
 
 \note{
-\textbf{Choice (15s).} Additive model answers “how many months gained?”; multiplicative answers “what ratio of RMST?”. Pick what clinicians find most natural. \\
-\textbf{Transition (2s).} Censoring may also depend on covariates—handle that next.
+\textbf{Choice (15s).} Additive model answers â€œhow many months gained?â€; multiplicative answers â€œwhat ratio of RMST?â€. Pick what clinicians find most natural. \\
+\textbf{Transition (2s).} Censoring may also depend on covariatesâ€”handle that next.
 }
 \end{frame}
 
@@ -405,8 +405,8 @@ where $B$ = number of bootstrap replicates.
 \end{block}
 
 \note{
-\textbf{Contrast (20s).} Analytical is fast and great for scanning sample sizes; bootstrap is flexible and validates power under complex settings. In RMSTSS we support both, often using analytical to search and bootstrap to confirm. \\
-\textbf{Transition (2s).} Let’s see two examples.
+\textbf{Contrast (20s).} Analytical is fast and great for scanning sample sizes; bootstrap is flexible and validates power under complex settings. In RMSTpowerBoost we support both, often using analytical to search and bootstrap to confirm. \\
+\textbf{Transition (2s).} Letâ€™s see two examples.
 }
 \end{frame}
 
@@ -433,9 +433,9 @@ ss_results_vet <- linear.ss.analytical(
 \end{lstlisting}
 {\scriptsize
 \textbf{Parameter Notes:} \\
-\texttt{n\_start} – starting sample size per arm. \\
-\texttt{n\_step} – increment at each step. \\
-\texttt{max\_n\_per\_arm} – upper cap considered. \\
+\texttt{n\_start} â€“ starting sample size per arm. \\
+\texttt{n\_step} â€“ increment at each step. \\
+\texttt{max\_n\_per\_arm} â€“ upper cap considered. \\
 }
   \end{column}
   \begin{column}{0.45\textwidth}
@@ -513,7 +513,7 @@ power_ms_boot <- MS.power.boot(
 \end{columns}
 
 \note{
-\textbf{Narrative (25s).} With stratification, we bootstrap power for the RMST ratio over a horizon of five years ($L=1825$). The mean ratio is about 1.0065, CI roughly 0.968–1.057 in this pilot. This demonstrates the workflow; real planning would refine assumptions and sample sizes. \\
+\textbf{Narrative (25s).} With stratification, we bootstrap power for the RMST ratio over a horizon of five years ($L=1825$). The mean ratio is about 1.0065, CI roughly 0.968â€“1.057 in this pilot. This demonstrates the workflow; real planning would refine assumptions and sample sizes. \\
 \textbf{Transition (2s).} Now the web app.
 }
 \end{frame}
@@ -533,7 +533,7 @@ power_ms_boot <- MS.power.boot(
 
 % ---------- Frame 17 ----------
 \begin{frame}
-\frametitle{RMSTSS: Web Application Feature}
+\frametitle{RMSTpowerBoost: Web Application Feature}
 
 \centering
 \scalebox{0.8}{%
@@ -578,12 +578,12 @@ power_ms_boot <- MS.power.boot(
 
 \begin{itemize}
 \centering
-    \item \textbf{Fully web-based} — no R installation required
+    \item \textbf{Fully web-based} â€” no R installation required
     \item \textbf{Interactive} plots and \textbf{customizable} visual themes
 \end{itemize}
 
 \note{
-\textbf{Summary (15s).} The workflow is simple: Input → Configure → Export. You can visualize survival/power curves and customize styling. It’s fully web-based—no local R setup required. \\
+\textbf{Summary (15s).} The workflow is simple: Input â†’ Configure â†’ Export. You can visualize survival/power curves and customize styling. Itâ€™s fully web-basedâ€”no local R setup required. \\
 \textbf{Transition (2s).} Final thoughts.
 }
 \end{frame}
@@ -609,7 +609,7 @@ power_ms_boot <- MS.power.boot(
 \end{block}
 
 \note{
-\textbf{Wrap (20s).} RMSTSS aims to make robust, interpretable planning routine. We support multiple models and both analytical and bootstrap power/SS calculations, in code and via a GUI. \\
+\textbf{Wrap (20s).} RMSTpowerBoost aims to make robust, interpretable planning routine. We support multiple models and both analytical and bootstrap power/SS calculations, in code and via a GUI. \\
 \textbf{Pause (2s).} Next, access and credits.
 }
 \end{frame}
@@ -639,12 +639,12 @@ power_ms_boot <- MS.power.boot(
 \qrcode[height=3cm]{https://arnab96.shinyapps.io/uthsc-app/}
 \vspace{2em}\\
 \textbf{Scan for R Package} \\
-\qrcode[height=3cm]{https://uthsc-zhang.github.io/RMSTSS-Package/}
+\qrcode[height=3cm]{https://uthsc-zhang.github.io/RMSTpowerBoost-Package/}
 \end{column}
 \end{columns}
 
 \note{
-\textbf{Close (20s).} Thanks to our mentors and collaborators, and to the funding support acknowledged here. The QR codes link to the live web app and package documentation. I’m happy to take questions. \\
+\textbf{Close (20s).} Thanks to our mentors and collaborators, and to the funding support acknowledged here. The QR codes link to the live web app and package documentation. Iâ€™m happy to take questions. \\
 \textbf{Optional pause (3s).} Invite discussion on use cases or integration in ongoing trials.
 }
 \end{frame}
@@ -656,7 +656,7 @@ power_ms_boot <- MS.power.boot(
 \bibliographystyle{plainnat}
 \bibliography{references}
 \note{
-Use author–year citations. If you’d rather hide this slide for time, you can comment it out; the in-slide citations will still render names/years.
+Use authorâ€“year citations. If youâ€™d rather hide this slide for time, you can comment it out; the in-slide citations will still render names/years.
 }
 \end{frame}
 
